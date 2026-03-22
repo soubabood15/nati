@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin</title>
+</head>
+
+<body>
+
+<h2>تعديل الفيرجن</h2>
+
+<input id="versionInput" placeholder="1.0.1">
+<button onclick="saveVersion()">حفظ</button>
+
+<script>
+// حماية
+if (localStorage.getItem("logged_in") !== "true") {
+  window.location.href = "index.html";
+}
+
+function saveVersion() {
+  const v = document.getElementById("versionInput").value;
+  localStorage.setItem("version", v);
+  alert("تم الحفظ");
+}
+</script>
+
+</body>
+</html>
