@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Break Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f3f4f6; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; white-space: nowrap; text-align: center; }
+    th { background:#f9fafb; position: sticky; top: 0; z-index: 2; }
+    th:first-child, td:first-child { position: sticky; right: 0; background: white; z-index: 1; text-align: right; font-weight: 700; }
+    th:first-child { background:#f9fafb; z-index: 3; }
+    .card { background:white; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+  </style>
+</head>
+<body>
+  <div class="min-h-screen p-5">
+    <div class="max-w-7xl mx-auto space-y-5">
+      <div class="card p-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Agent Status & Break Calculator</h1>
+            <p class="text-gray-500 mt-1">ارفع ملف Excel، والنظام يجمع كل Agent في صف واحد وكل الحالات المطلوبة جنب بعض.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer font-bold">
+              رفع ملف Excel
+              <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
+            </label>
+            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>تحميل Excel مرتب</button>
+            <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">مسح</button>
+          </div>
+        </div>
+        <div id="message" class="mt-4 text-sm"></div>
+      </div>
+
+      <div id="summaryCards" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+
+      <div class="card p-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <h2 class="text-xl font-bold">النتيجة</h2>
+          <input id="searchInput" type="text" placeholder="بحث باسم الإيجنت..." class="border rounded-lg px-3 py-2 w-full md:w-80" />
+        </div>
+        <div id="tableWrap" class="overflow-auto max-h-[70vh] rounded-lg border bg-white">
+          <div class="p-10 text-center text-gray-400">ارفع ملف Excel لعرض النتائج.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let rawRows = [];
+    let resultRows = [];
+    let statusColumns = [];
+
+    const fileInput = document.getElementById('fileInput');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const searchInput = document.getElementById('searchInput');
+    const message = document.getElementById('message');
+    const tableWrap = document.getElementById('tableWrap');
+    const summaryCards = document.getElementById('summaryCards');
+
+    const mealStatuses = ['Break', 'Meal'];
+    const trainingKeywords = ['training'];
+    const preparationKeywords = ['preparing', 'prepare', 'prep'];
+    const idleStatuses = [
+      'Idle',
+      'Preparing for Idle',
+      'Idle with chat',
+      'Outbound with chat',
+      'Full Capacity',
+      'Outbound-Full Capacity'
+    ];
+    const busyKeywords = ['busy'];
+    const busyStatuses = ['Outbound without chat'];
+
+    function showMessage(text, type = 'info') {
+      const colors = {
+        info: 'text-gray-600',
+        success: 'text-green-700 bg-green-50 border border-green-200 rounded-lg p-3',
+        error: 'text-red-700 bg-red-50 border border-red-200 rounded-lg p-3'
+      };
+      message.className = 'mt-4 text-sm ' + (colors[type] || colors.info);
+      message.textContent = text || '';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function normalizeHeader(value) {
+      return String(value ?? '').trim().toLowerCase().replaceAll('_', ' ').replace(/\s+/g, ' ');
+    }
+
+    function findHeader(headers, candidates) {
+      const normalized = headers.map(normalizeHeader);
+      for (const candidate of candidates) {
+        const idx = normalized.indexOf(normalizeHeader(candidate));
+        if (idx !== -1) return headers[idx];
+      }
+      return null;
+    }
+
+    function parseDurationToMinutes(value) {
+      if (value == null || value === '') return 0;
+
+      if (typeof value === 'number') {
+        if (!isFinite(value) || value < 0) return 0;
+        return value;
+      }
+
+      const s = String(value).trim();
+      if (!s) return 0;
+
+      if (s.includes(':')) {
+        const parts = s.split(':').map(x => parseFloat(x) || 0);
+        if (parts.length >= 3) return parts[0] * 60 + parts[1] + parts[2] / 60;
+        if (parts.length === 2) return parts[0] * 60 + parts[1];
+      }
+
+      const n = parseFloat(s);
+      if (isNaN(n) || n < 0) return 0;
+      return n;
+    }
+
+    function formatMinutes(minutes) {
+      const totalSeconds = Math.round((Number(minutes) || 0) * 60);
+      const h = Math.floor(totalSeconds / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function processRows(rows) {
+      rawRows = rows;
+      resultRows = [];
+      statusColumns = [];
+
+      if (!rows.length) throw new Error('الملف فارغ.');
+
+      const headers = Object.keys(rows[0]);
+      const agentKey = findHeader(headers, ['Agent name', 'Agent Name', 'agent', 'agent name', 'name']);
+      const statusKey = findHeader(headers, ['status', 'Status']);
+      const durationKey = findHeader(headers, ['status_duration', 'Status Duration', 'duration', 'Duration']);
+
+      if (!agentKey || !statusKey || !durationKey) {
+        throw new Error('لازم الملف يحتوي أعمدة: Agent name / status / status_duration');
+      }
+
+      const agentMap = new Map();
+      const statusSet = new Set();
+
+      rows.forEach(row => {
+        const agent = String(row[agentKey] ?? '').trim();
+        const status = String(row[statusKey] ?? '').trim();
+        const duration = parseDurationToMinutes(row[durationKey]);
+        if (!agent || !status) return;
+
+        const normalizedStatus = status.toLowerCase();
+        const isPrepStatus = preparationKeywords.some(keyword => normalizedStatus.includes(keyword));
+        const isBusyStatus = busyKeywords.some(keyword => normalizedStatus.includes(keyword)) || busyStatuses.includes(status);
+        const isTrainingStatus = trainingKeywords.some(keyword => normalizedStatus.includes(keyword));
+        const isIdleStatus = idleStatuses.includes(status);
+        const isMealStatus = mealStatuses.includes(status);
+
+        if (!isIdleStatus && !isBusyStatus && !isPrepStatus && !isTrainingStatus && !isMealStatus) {
+          statusSet.add(status);
+        }
+
+        if (!agentMap.has(agent)) {
+          agentMap.set(agent, {
+            'Agent name': agent,
+            'Idle Total': 0,
+            'Busy': 0,
+            'Training': 0,
+            'Meal': 0,
+            'Prep Break': 0,
+            'Total': 0
+          });
+        }
+
+        const rec = agentMap.get(agent);
+        rec.Total += duration;
+        if (isIdleStatus) rec['Idle Total'] += duration;
+        if (isBusyStatus) rec['Busy'] += duration;
+        if (isTrainingStatus) rec['Training'] += duration;
+        if (isMealStatus) rec['Meal'] += duration;
+        if (isPrepStatus) rec['Prep Break'] += duration;
+        if (!isIdleStatus && !isBusyStatus && !isPrepStatus && !isTrainingStatus && !isMealStatus) {
+          rec[status] = (rec[status] || 0) + duration;
+        }
+      });
+
+      statusColumns = Array.from(statusSet).sort((a, b) => a.localeCompare(b));
+      resultRows = Array.from(agentMap.values()).sort((a, b) => a['Agent name'].localeCompare(b['Agent name']));
+    }
+
+    function renderSummary() {
+      const totalAgents = resultRows.length;
+
+      function topAgentsBy(key, limit = 3) {
+        return resultRows
+          .map(row => ({
+            name: row['Agent name'],
+            minutes: row[key] || 0
+          }))
+          .filter(item => item.minutes > 0)
+          .sort((a, b) => b.minutes - a.minutes)
+          .slice(0, limit);
+      }
+
+      function renderTopList(items) {
+        if (!items.length) return '<div class="text-gray-400 text-sm mt-2">لا يوجد بيانات</div>';
+        return `
+          <ol class="mt-2 space-y-1 text-sm">
+            ${items.map((item, index) => `
+              <li class="flex items-center justify-between gap-2">
+                <span class="font-semibold text-gray-700">${index + 1}. ${escapeHtml(item.name)}</span>
+                <span class="text-gray-500">${formatMinutes(item.minutes)}</span>
+              </li>
+            `).join('')}
+          </ol>
+        `;
+      }
+
+      const topIdle = topAgentsBy('Idle Total', 1)[0];
+      const topBusy = topAgentsBy('Busy', 3);
+      const topMeal = topAgentsBy('Meal', 3);
+      const topTraining = topAgentsBy('Training', 3);
+
+      summaryCards.innerHTML = `
+        <div class="card p-4">
+          <div class="text-gray-500 text-sm">أفضل Idle Agent</div>
+          <div class="text-xl font-bold mt-2">${topIdle ? escapeHtml(topIdle.name) : 'لا يوجد'}</div>
+          <div class="text-gray-500 mt-1">${topIdle ? formatMinutes(topIdle.minutes) : '00:00:00'}</div>
+        </div>
+
+        <div class="card p-4">
+          <div class="text-gray-500 text-sm">Top 3 Busy</div>
+          ${renderTopList(topBusy)}
+        </div>
+
+        <div class="card p-4">
+          <div class="text-gray-500 text-sm">Top 3 Meal</div>
+          ${renderTopList(topMeal)}
+        </div>
+
+        <div class="card p-4">
+          <div class="text-gray-500 text-sm">Top 3 Training</div>
+          ${renderTopList(topTraining)}
+        </div>
+      `;
+    }
+
+    function getColumns() {
+      return ['Agent name', 'Idle Total', 'Busy', 'Training', 'Meal', 'Prep Break', ...statusColumns, 'Total'];
+    }
+
+    function renderTable() {
+      const search = searchInput.value.trim().toLowerCase();
+      const visibleRows = resultRows.filter(r => r['Agent name'].toLowerCase().includes(search));
+      const columns = getColumns();
+
+      if (!visibleRows.length) {
+        tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">لا توجد بيانات.</div>';
+        return;
+      }
+
+      tableWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>${columns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}</tr>
+          </thead>
+          <tbody>
+            ${visibleRows.map(row => `
+              <tr>
+                ${columns.map(col => {
+                  const value = col === 'Agent name' ? row[col] : formatMinutes(row[col] || 0);
+                  return `<td>${escapeHtml(value)}</td>`;
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderTable();
+      exportBtn.disabled = !resultRows.length;
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      showMessage('جاري قراءة الملف...', 'info');
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+          processRows(rows);
+          renderAll();
+          showMessage(`تمت قراءة الملف بنجاح: ${resultRows.length} إيجنت و ${statusColumns.length} حالة.`, 'success');
+        } catch (err) {
+          tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">فشل قراءة الملف.</div>';
+          summaryCards.innerHTML = '';
+          exportBtn.disabled = true;
+          showMessage(err.message || String(err), 'error');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    searchInput.addEventListener('input', renderTable);
+
+    clearBtn.addEventListener('click', () => {
+      rawRows = [];
+      resultRows = [];
+      statusColumns = [];
+      fileInput.value = '';
+      searchInput.value = '';
+      summaryCards.innerHTML = '';
+      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">ارفع ملف Excel لعرض النتائج.</div>';
+      exportBtn.disabled = true;
+      showMessage('', 'info');
+    });
+
+    exportBtn.addEventListener('click', () => {
+      if (!resultRows.length) return;
+
+      const columns = getColumns();
+      const exportData = resultRows.map(row => {
+        const out = {};
+        columns.forEach(col => {
+          out[col] = col === 'Agent name' ? row[col] : formatMinutes(row[col] || 0);
+        });
+        return out;
+      });
+
+      const ws = XLSX.utils.json_to_sheet(exportData, { header: columns });
+      ws['!cols'] = columns.map(col => ({ wch: col === 'Agent name' ? 28 : Math.max(16, col.length + 2) }));
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Agent Summary');
+
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      XLSX.writeFile(wb, `agent-status-summary-${yyyy}-${mm}-${dd}.xlsx`);
+    });
+  </script>
+</body>
+</html>
