@@ -14,6 +14,18 @@
     th:first-child, td:first-child { position: sticky; right: 0; background: white; z-index: 1; text-align: right; font-weight: 700; }
     th:first-child { background:#f9fafb; z-index: 3; }
     .card { background:white; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+
+    .drop-zone {
+      border: 2px dashed #93c5fd;
+      background: #eff6ff;
+      transition: .2s ease;
+    }
+
+    .drop-zone.dragover {
+      border-color: #2563eb;
+      background: #dbeafe;
+      transform: scale(1.01);
+    }
   </style>
 </head>
 <body>
@@ -22,15 +34,17 @@
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">Agent Status & Break Calculator</h1>
-            <p class="text-gray-500 mt-1">ارفع ملف Excel، والنظام يجمع كل Agent في صف واحد وكل الحالات المطلوبة جنب بعض.</p>
+            <h1 class="text-2xl font-bold text-gray-900">تحياتي واشواقي</h1>
+            <p class="text-gray-500 mt-1"> سكربتاتك معلم</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <label class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg cursor-pointer font-bold">
-              رفع ملف Excel
+            <div id="dropZone" class="drop-zone px-6 py-4 rounded-xl text-center cursor-pointer min-w-[260px]">
+              <div class="font-bold text-blue-700">اسحب ملف الإكسل وارمه هون</div>
+              <div class="text-sm text-gray-500 mt-1">أو اضغط لاختيار الملف</div>
               <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
-            </label>
-            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>تحميل Excel مرتب</button>
+            </div>
+
+            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>تحميل</button>
             <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">مسح</button>
           </div>
         </div>
@@ -42,7 +56,7 @@
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
           <h2 class="text-xl font-bold">النتيجة</h2>
-          <input id="searchInput" type="text" placeholder="بحث باسم الإيجنت..." class="border rounded-lg px-3 py-2 w-full md:w-80" />
+          <input id="searchInput" type="text" placeholder="دور على الايجنت الفخم " class="border rounded-lg px-3 py-2 w-full md:w-80" />
         </div>
         <div id="tableWrap" class="overflow-auto max-h-[70vh] rounded-lg border bg-white">
           <div class="p-10 text-center text-gray-400">ارفع ملف Excel لعرض النتائج.</div>
@@ -58,6 +72,7 @@
 
     const fileInput = document.getElementById('fileInput');
     const exportBtn = document.getElementById('exportBtn');
+    const dropZone = document.getElementById('dropZone');
     const clearBtn = document.getElementById('clearBtn');
     const searchInput = document.getElementById('searchInput');
     const message = document.getElementById('message');
@@ -300,8 +315,7 @@
       exportBtn.disabled = !resultRows.length;
     }
 
-    fileInput.addEventListener('change', (event) => {
-      const file = event.target.files && event.target.files[0];
+    function handleExcelFile(file) {
       if (!file) return;
 
       showMessage('جاري قراءة الملف...', 'info');
@@ -323,6 +337,32 @@
         }
       };
       reader.readAsArrayBuffer(file);
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      handleExcelFile(file);
+    });
+
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      handleExcelFile(file);
     });
 
     searchInput.addEventListener('input', renderTable);
