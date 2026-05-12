@@ -34,18 +34,18 @@
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900">تحياتي واشواقي</h1>
-            <p class="text-gray-500 mt-1"> سكربتاتك معلم</p>
+            <h1 class="text-2xl font-bold text-gray-900"> Payroll system</h1>
+            <p class="text-gray-500 mt-1"> Created by Tamer iswed </p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <div id="dropZone" class="drop-zone px-6 py-4 rounded-xl text-center cursor-pointer min-w-[260px]">
-              <div class="font-bold text-blue-700">اسحب ملف الإكسل وارمه هون</div>
-              <div class="text-sm text-gray-500 mt-1">أو اضغط لاختيار الملف</div>
+              <div class="font-bold text-blue-700"> Upload </div>
+              <div class="text-sm text-gray-500 mt-1"></div>
               <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
             </div>
 
-            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>تحميل</button>
-            <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">مسح</button>
+            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>Export</button>
+            <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">Delete</button>
           </div>
         </div>
         <div id="message" class="mt-4 text-sm"></div>
@@ -55,11 +55,11 @@
 
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <h2 class="text-xl font-bold">النتيجة</h2>
-          <input id="searchInput" type="text" placeholder="دور على الايجنت الفخم " class="border rounded-lg px-3 py-2 w-full md:w-80" />
+          <h2 class="text-xl font-bold">Result</h2>
+          <input id="searchInput" type="text" placeholder=" Search " class="border rounded-lg px-3 py-2 w-full md:w-80" />
         </div>
         <div id="tableWrap" class="overflow-auto max-h-[70vh] rounded-lg border bg-white">
-          <div class="p-10 text-center text-gray-400">ارفع ملف Excel لعرض النتائج.</div>
+          <div class="p-10 text-center text-gray-400"> Data </div>
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@
       const durationKey = findHeader(headers, ['status_duration', 'Status Duration', 'duration', 'Duration']);
 
       if (!agentKey || !statusKey || !durationKey) {
-        throw new Error('لازم الملف يحتوي أعمدة: Agent name / status / status_duration');
+        throw new Error('Ne row data: Agent name / status / status_duration');
       }
 
       const agentMap = new Map();
@@ -234,7 +234,7 @@
       }
 
       function renderTopList(items) {
-        if (!items.length) return '<div class="text-gray-400 text-sm mt-2">لا يوجد بيانات</div>';
+        if (!items.length) return '<div class="text-gray-400 text-sm mt-2">No data</div>';
         return `
           <ol class="mt-2 space-y-1 text-sm">
             ${items.map((item, index) => `
@@ -254,8 +254,8 @@
 
       summaryCards.innerHTML = `
         <div class="card p-4">
-          <div class="text-gray-500 text-sm">أفضل Idle Agent</div>
-          <div class="text-xl font-bold mt-2">${topIdle ? escapeHtml(topIdle.name) : 'لا يوجد'}</div>
+          <div class="text-gray-500 text-sm">Best Idle Agent</div>
+          <div class="text-xl font-bold mt-2">${topIdle ? escapeHtml(topIdle.name) : 'No data'}</div>
           <div class="text-gray-500 mt-1">${topIdle ? formatMinutes(topIdle.minutes) : '00:00:00'}</div>
         </div>
 
@@ -286,7 +286,7 @@
       const columns = getColumns();
 
       if (!visibleRows.length) {
-        tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">لا توجد بيانات.</div>';
+        tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">No data</div>';
         return;
       }
 
@@ -328,7 +328,7 @@
           const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
           processRows(rows);
           renderAll();
-          showMessage(`تمت قراءة الملف بنجاح: ${resultRows.length} إيجنت و ${statusColumns.length} حالة.`, 'success');
+          showMessage(` Read sucssed  : ${resultRows.length} Agent  ${statusColumns.length} Status.`, 'success');
         } catch (err) {
           tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">فشل قراءة الملف.</div>';
           summaryCards.innerHTML = '';
