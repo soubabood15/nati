@@ -1,51 +1,383 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
+<html lang="en" dir="ltr"><head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agent Break Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; background:#f3f4f6; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; white-space: nowrap; text-align: center; }
-    th { background:#f9fafb; position: sticky; top: 0; z-index: 2; }
-    th:first-child, td:first-child { position: sticky; right: 0; background: white; z-index: 1; text-align: right; font-weight: 700; }
-    th:first-child { background:#f9fafb; z-index: 3; }
-    .card { background:white; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,.08); }
+    :root {
+      --bg: #020617;
+      --panel: rgba(15, 23, 42, .86);
+      --border: rgba(148, 163, 184, .22);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+
+    /* Custom dark scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(56, 189, 248, .55) rgba(15, 23, 42, .65);
+    }
+
+    *::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    *::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, .72);
+      border-radius: 999px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, .12);
+    }
+
+    *::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(56, 189, 248, .75), rgba(37, 99, 235, .75));
+      border-radius: 999px;
+      border: 2px solid rgba(15, 23, 42, .9);
+    }
+
+    *::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, #38bdf8, #2563eb);
+    }
+
+    *::-webkit-scrollbar-corner {
+      background: rgba(15, 23, 42, .72);
+    }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, .22), transparent 30%),
+        radial-gradient(circle at top right, rgba(34, 197, 94, .13), transparent 28%),
+        linear-gradient(135deg, #020617 0%, #0f172a 55%, #111827 100%);
+      min-height: 100vh;
+    }
+    table { border-collapse: separate; border-spacing: 0; width: 100%; color: #dbeafe; font-size: 13px; }
+    th, td { border-bottom: 1px solid rgba(148, 163, 184, .18); border-left: 1px solid rgba(148, 163, 184, .12); padding: 10px 12px; white-space: nowrap; text-align: center; }
+    th { background: rgba(15, 23, 42, .96); color: #93c5fd; position: sticky; top: 0; z-index: 2; text-transform: uppercase; font-size: 12px; letter-spacing: .06em; }
+    th:first-child, td:first-child { position: sticky; right: 0; background: rgba(15, 23, 42, .98); z-index: 1; text-align: left; font-weight: 800; color: #f8fafc; }
+    th:first-child { z-index: 3; color: #bae6fd; }
+    tbody tr:hover td { background: rgba(59, 130, 246, .11); }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 22px 70px rgba(0, 0, 0, .34); backdrop-filter: blur(16px); }
+
+    .summary-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, .96), rgba(15, 23, 42, .76));
+      border: 1px solid rgba(148, 163, 184, .18);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, .26);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56, 189, 248, .38);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .34);
+    }
+
+    .summary-card.accent-idle { border-top: 4px solid #38bdf8; }
+    .summary-card.accent-busy { border-top: 4px solid #3b82f6; }
+    .summary-card.accent-meal { border-top: 4px solid #22c55e; }
+    .summary-card.accent-training { border-top: 4px solid #8b5cf6; }
+
+    .summary-title {
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 14px;
+    }
+
+    .summary-main {
+      color: #f8fafc;
+      font-size: 24px;
+      font-weight: 950;
+      line-height: 1.15;
+    }
+
+    .summary-time {
+      margin-top: 10px;
+      color: #7dd3fc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(2, 6, 23, .32);
+      border: 1px solid rgba(148, 163, 184, .10);
+    }
+
+    .rank-badge {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, .12);
+      color: #7dd3fc;
+      font-size: 12px;
+      font-weight: 950;
+      border: 1px solid rgba(56, 189, 248, .22);
+    }
+
+    .summary-name {
+      color: #e5e7eb;
+      font-weight: 850;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .summary-value {
+      color: #bae6fd;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .no-data {
+      color: #94a3b8;
+      font-weight: 800;
+      margin-top: 12px;
+    }
 
     .drop-zone {
-      border: 2px dashed #93c5fd;
-      background: #eff6ff;
+      border: 1px dashed rgba(56, 189, 248, .65);
+      background: linear-gradient(135deg, rgba(14, 165, 233, .16), rgba(30, 41, 59, .45));
       transition: .2s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
     }
 
     .drop-zone.dragover {
-      border-color: #2563eb;
-      background: #dbeafe;
-      transform: scale(1.01);
+      border-color: #38bdf8;
+      background: rgba(14, 165, 233, .25);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 0 30px rgba(56, 189, 248, .28);
+    }
+
+    .tech-title {
+      background: linear-gradient(90deg, #e0f2fe, #38bdf8, #22c55e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: .02em;
+    }
+
+    .tech-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(56, 189, 248, .35);
+      background: rgba(2, 132, 199, .12);
+      color: #bae6fd;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tech-badge::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 14px #22c55e;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border: 1px solid rgba(255,255,255,.08);
+      transition: .18s ease;
+      box-shadow: 0 12px 24px rgba(0,0,0,.22);
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #052e16;
+    }
+
+    .secondary-btn {
+      background: rgba(148, 163, 184, .14);
+      color: #e2e8f0;
+    }
+
+    .action-control {
+      height: 112px;
+      min-width: 180px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-control {
+      width: 420px;
+      max-width: 100%;
+      flex-direction: column;
+    }
+
+    input {
+      background: rgba(15, 23, 42, .8) !important;
+      border: 1px solid rgba(148, 163, 184, .24) !important;
+      color: #e5e7eb !important;
+      outline: none;
+    }
+
+    input::placeholder { color: #64748b; }
+
+    input:focus { border-color: #38bdf8 !important; box-shadow: 0 0 0 3px rgba(56, 189, 248, .15); }
+
+    #message {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      border: 1px solid rgba(34, 197, 94, .28);
+      background: linear-gradient(135deg, rgba(22, 163, 74, .18), rgba(14, 165, 233, .10));
+      color: #bbf7d0;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, .22), inset 0 0 0 1px rgba(255, 255, 255, .04);
+      transform: translateY(-8px);
+      opacity: 0;
+    }
+
+    #message.show {
+      display: flex;
+      animation: messageSlideIn .45s ease forwards;
+    }
+
+    #message.success {
+      border-color: rgba(34, 197, 94, .35);
+      color: #bbf7d0;
+    }
+
+    #message.error {
+      border-color: rgba(248, 113, 113, .35);
+      background: linear-gradient(135deg, rgba(239, 68, 68, .20), rgba(30, 41, 59, .35));
+      color: #fecaca;
+    }
+
+    #message.info {
+      border-color: rgba(56, 189, 248, .35);
+      background: linear-gradient(135deg, rgba(14, 165, 233, .16), rgba(30, 41, 59, .35));
+      color: #bae6fd;
+    }
+
+    #message .message-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 18px #22c55e;
+      flex: 0 0 auto;
+      animation: pulseDot 1.2s ease-in-out infinite;
+    }
+
+    #message.error .message-dot {
+      background: #ef4444;
+      box-shadow: 0 0 18px #ef4444;
+    }
+
+    #message.info .message-dot {
+      background: #38bdf8;
+      box-shadow: 0 0 18px #38bdf8;
+    }
+
+    #message .message-text {
+      flex: 1;
+    }
+
+    @keyframes messageSlideIn {
+      from { opacity: 0; transform: translateY(-10px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: .75; }
+      50% { transform: scale(1.35); opacity: 1; }
+    }
+
+    .metric-cell {
+      font-weight: 700;
+      cursor: help;
+      border-radius: 6px;
+    }
+
+    .metric-idle { background: rgba(239, 68, 68, .18) !important; color: #fecaca !important; }
+.metric-busy { background: rgba(59, 130, 246, .22) !important; color: #bfdbfe !important; }
+.metric-training { background: rgba(139, 92, 246, .22) !important; color: #ddd6fe !important; }
+.metric-meal { background: rgba(34, 197, 94, .18) !important; color: #bbf7d0 !important; }
+.metric-preparing { background: rgba(217, 70, 239, .18) !important; color: #f5d0fe !important; }
+
+    .custom-tooltip {
+      position: fixed;
+      display: none;
+      max-width: 320px;
+      background: #111827;
+      color: white;
+      padding: 10px 12px;
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      z-index: 9999;
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-line;
+      direction: ltr;
+      text-align: left;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <div class="min-h-screen p-5">
+  <div id="customTooltip" class="custom-tooltip"></div>
+  <div class="min-h-screen p-5 md:p-8">
     <div class="max-w-7xl mx-auto space-y-5">
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900"> Payroll system</h1>
-            <p class="text-gray-500 mt-1"> Created by Tamer iswed </p>
+          <div class="space-y-3">
+            <div class="tech-badge">LIVE STATUS PROCESSOR</div>
+            <h1 class="tech-title text-4xl font-black">Payroll System</h1>
+            <p class="text-slate-400 mt-1">Created by Tamer Iswed • Agent status analytics engine</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <div id="dropZone" class="drop-zone px-6 py-4 rounded-xl text-center cursor-pointer min-w-[260px]">
-              <div class="font-bold text-blue-700"> Upload </div>
-              <div class="text-sm text-gray-500 mt-1"></div>
+            <div id="dropZone" class="drop-zone action-control upload-control px-7 py-5 rounded-2xl text-center cursor-pointer">
+              <div class="font-black text-sky-200 text-lg">Upload Excel</div>
+              <div class="text-sm text-slate-400 mt-1">Drag & drop your .xlsx file here</div>
               <input id="fileInput" type="file" accept=".xlsx,.xls" class="hidden" />
             </div>
 
-            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-40" disabled>Export</button>
-            <button id="clearBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">Delete</button>
+            <button id="exportBtn" class="primary-btn action-control px-5 py-3 rounded-2xl font-black text-2xl disabled:opacity-40" disabled>Export</button>
+            <button id="clearBtn" class="secondary-btn action-control px-5 py-3 rounded-2xl font-black text-2xl">Delete</button>
           </div>
         </div>
         <div id="message" class="mt-4 text-sm"></div>
@@ -55,10 +387,10 @@
 
       <div class="card p-5">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-          <h2 class="text-xl font-bold">Result</h2>
-          <input id="searchInput" type="text" placeholder=" Search " class="border rounded-lg px-3 py-2 w-full md:w-80" />
+          <h2 class="text-xl font-black text-sky-100">Result Matrix</h2>
+          <input id="searchInput" type="text" placeholder="Search agent..." class="rounded-xl px-4 py-3 w-full md:w-80" />
         </div>
-        <div id="tableWrap" class="overflow-auto max-h-[70vh] rounded-lg border bg-white">
+        <div id="tableWrap" class="overflow-auto max-h-[70vh] rounded-xl border border-slate-700 bg-slate-950/60">
           <div class="p-10 text-center text-gray-400"> Data </div>
         </div>
       </div>
@@ -78,13 +410,13 @@
     const message = document.getElementById('message');
     const tableWrap = document.getElementById('tableWrap');
     const summaryCards = document.getElementById('summaryCards');
+    const customTooltip = document.getElementById('customTooltip');
 
     const mealStatuses = ['Break', 'Meal'];
     const trainingKeywords = ['training'];
-    const preparationKeywords = ['preparing', 'prepare', 'prep'];
+    const preparationKeywords = ['preparing', 'prepare', 'prep', 'preparing for idle'];
     const idleStatuses = [
       'Idle',
-      'Preparing for Idle',
       'Idle with chat',
       'Outbound with chat',
       'Full Capacity',
@@ -94,13 +426,18 @@
     const busyStatuses = ['Outbound without chat'];
 
     function showMessage(text, type = 'info') {
-      const colors = {
-        info: 'text-gray-600',
-        success: 'text-green-700 bg-green-50 border border-green-200 rounded-lg p-3',
-        error: 'text-red-700 bg-red-50 border border-red-200 rounded-lg p-3'
-      };
-      message.className = 'mt-4 text-sm ' + (colors[type] || colors.info);
-      message.textContent = text || '';
+      if (!text) {
+        message.className = '';
+        message.innerHTML = '';
+        return;
+      }
+
+      const safeText = escapeHtml(text);
+      message.className = `show ${type}`;
+      message.innerHTML = `
+        <span class="message-dot"></span>
+        <span class="message-text">${safeText}</span>
+      `;
     }
 
     function escapeHtml(value) {
@@ -160,7 +497,7 @@
       resultRows = [];
       statusColumns = [];
 
-      if (!rows.length) throw new Error('الملف فارغ.');
+      if (!rows.length) throw new Error('Empty file');
 
       const headers = Object.keys(rows[0]);
       const agentKey = findHeader(headers, ['Agent name', 'Agent Name', 'agent', 'agent name', 'name']);
@@ -198,18 +535,45 @@
             'Busy': 0,
             'Training': 0,
             'Meal': 0,
-            'Prep Break': 0,
-            'Total': 0
+            'Preparing': 0,
+            'Total': 0,
+            details: {
+              Idle: {},
+              Busy: {},
+              Training: {},
+              Meal: {},
+              Prep: {}
+            }
           });
         }
 
         const rec = agentMap.get(agent);
+
+        function addDetail(group, statusName, minutes) {
+          rec.details[group][statusName] = (rec.details[group][statusName] || 0) + minutes;
+        }
+
         rec.Total += duration;
-        if (isIdleStatus) rec['Idle Total'] += duration;
-        if (isBusyStatus) rec['Busy'] += duration;
-        if (isTrainingStatus) rec['Training'] += duration;
-        if (isMealStatus) rec['Meal'] += duration;
-        if (isPrepStatus) rec['Prep Break'] += duration;
+        if (isIdleStatus) {
+          rec['Idle Total'] += duration;
+          addDetail('Idle', status, duration);
+        }
+        if (isBusyStatus) {
+          rec['Busy'] += duration;
+          addDetail('Busy', status, duration);
+        }
+        if (isTrainingStatus) {
+          rec['Training'] += duration;
+          addDetail('Training', status, duration);
+        }
+        if (isMealStatus) {
+          rec['Meal'] += duration;
+          addDetail('Meal', status, duration);
+        }
+        if (isPrepStatus) {
+          rec['Preparing'] += duration;
+          addDetail('Prep', status, duration);
+        }
         if (!isIdleStatus && !isBusyStatus && !isPrepStatus && !isTrainingStatus && !isMealStatus) {
           rec[status] = (rec[status] || 0) + duration;
         }
@@ -234,16 +598,17 @@
       }
 
       function renderTopList(items) {
-        if (!items.length) return '<div class="text-gray-400 text-sm mt-2">No data</div>';
+        if (!items.length) return '<div class="no-data">No data</div>';
         return `
-          <ol class="mt-2 space-y-1 text-sm">
+          <div class="summary-list">
             ${items.map((item, index) => `
-              <li class="flex items-center justify-between gap-2">
-                <span class="font-semibold text-gray-700">${index + 1}. ${escapeHtml(item.name)}</span>
-                <span class="text-gray-500">${formatMinutes(item.minutes)}</span>
-              </li>
+              <div class="summary-row">
+                <span class="rank-badge">${index + 1}</span>
+                <span class="summary-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>
+                <span class="summary-value">${formatMinutes(item.minutes)}</span>
+              </div>
             `).join('')}
-          </ol>
+          </div>
         `;
       }
 
@@ -253,31 +618,77 @@
       const topTraining = topAgentsBy('Training', 3);
 
       summaryCards.innerHTML = `
-        <div class="card p-4">
-          <div class="text-gray-500 text-sm">Best Idle Agent</div>
-          <div class="text-xl font-bold mt-2">${topIdle ? escapeHtml(topIdle.name) : 'No data'}</div>
-          <div class="text-gray-500 mt-1">${topIdle ? formatMinutes(topIdle.minutes) : '00:00:00'}</div>
+        <div class="card summary-card accent-idle p-5">
+          <div class="summary-title">Best Idle Agent</div>
+          <div class="summary-main">${topIdle ? escapeHtml(topIdle.name) : 'No data'}</div>
+          <div class="summary-time">${topIdle ? formatMinutes(topIdle.minutes) : '00:00:00'}</div>
         </div>
 
-        <div class="card p-4">
-          <div class="text-gray-500 text-sm">Top 3 Busy</div>
+        <div class="card summary-card accent-busy p-5">
+          <div class="summary-title">Top 3 Busy</div>
           ${renderTopList(topBusy)}
         </div>
 
-        <div class="card p-4">
-          <div class="text-gray-500 text-sm">Top 3 Meal</div>
+        <div class="card summary-card accent-meal p-5">
+          <div class="summary-title">Top 3 Meal</div>
           ${renderTopList(topMeal)}
         </div>
 
-        <div class="card p-4">
-          <div class="text-gray-500 text-sm">Top 3 Training</div>
+        <div class="card summary-card accent-training p-5">
+          <div class="summary-title">Top 3 Training</div>
           ${renderTopList(topTraining)}
         </div>
       `;
     }
 
     function getColumns() {
-      return ['Agent name', 'Idle Total', 'Busy', 'Training', 'Meal', 'Prep Break', ...statusColumns, 'Total'];
+      return ['Agent name', 'Idle Total', 'Busy', 'Training', 'Meal', 'Preparing', ...statusColumns, 'Total'];
+    }
+
+    function buildTooltip(details) {
+      if (!details) return '';
+
+      return Object.entries(details)
+        .filter(([_, minutes]) => minutes > 0)
+        .map(([status, minutes]) => `${status}: ${formatMinutes(minutes)}`)
+        .join('\n');
+    }
+
+    function getMetricClass(col, minutes) {
+      let classes = '';
+      if (col === 'Idle Total') classes = 'metric-cell metric-idle';
+      if (col === 'Busy') classes = 'metric-cell metric-busy';
+      if (col === 'Training') classes = 'metric-cell metric-training';
+      if (col === 'Meal') classes = 'metric-cell metric-meal';
+      if (col === 'Preparing') classes = 'metric-cell metric-preparing';
+
+      // Warning thresholds in minutes.
+      if (col === 'Meal' && minutes > 60) classes += ' metric-warning';
+      if (col === 'Idle Total' && minutes > 120) classes += ' metric-warning';
+      if (col === 'Preparing' && minutes > 20) classes += ' metric-warning';
+
+      return classes;
+    }
+
+    function attachTooltips() {
+      document.querySelectorAll('[data-tooltip]').forEach(cell => {
+        cell.addEventListener('mouseenter', () => {
+          const text = cell.getAttribute('data-tooltip');
+          if (!text) return;
+          customTooltip.textContent = text;
+          customTooltip.style.display = 'block';
+        });
+
+        cell.addEventListener('mousemove', (e) => {
+          customTooltip.style.left = `${e.clientX + 14}px`;
+          customTooltip.style.top = `${e.clientY + 14}px`;
+        });
+
+        cell.addEventListener('mouseleave', () => {
+          customTooltip.style.display = 'none';
+          customTooltip.textContent = '';
+        });
+      });
     }
 
     function renderTable() {
@@ -299,14 +710,27 @@
             ${visibleRows.map(row => `
               <tr>
                 ${columns.map(col => {
-                  const value = col === 'Agent name' ? row[col] : formatMinutes(row[col] || 0);
-                  return `<td>${escapeHtml(value)}</td>`;
+                  const minutes = col === 'Agent name' ? 0 : (row[col] || 0);
+                  const value = col === 'Agent name' ? row[col] : formatMinutes(minutes);
+
+                  let tooltip = '';
+                  if (col === 'Idle Total') tooltip = buildTooltip(row.details?.Idle);
+                  if (col === 'Busy') tooltip = buildTooltip(row.details?.Busy);
+                  if (col === 'Training') tooltip = buildTooltip(row.details?.Training);
+                  if (col === 'Meal') tooltip = buildTooltip(row.details?.Meal);
+                  if (col === 'Preparing') tooltip = buildTooltip(row.details?.Prep);
+
+                  const className = getMetricClass(col, minutes);
+                  const tooltipAttr = tooltip ? ` data-tooltip="${escapeHtml(tooltip)}"` : '';
+
+                  return `<td class="${className}"${tooltipAttr}>${escapeHtml(value)}</td>`;
                 }).join('')}
               </tr>
             `).join('')}
           </tbody>
         </table>
       `;
+      attachTooltips();
     }
 
     function renderAll() {
@@ -318,7 +742,7 @@
     function handleExcelFile(file) {
       if (!file) return;
 
-      showMessage('جاري قراءة الملف...', 'info');
+      showMessage('Reading file  ...', 'info');
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -330,7 +754,7 @@
           renderAll();
           showMessage(` Read sucssed  : ${resultRows.length} Agent  ${statusColumns.length} Status.`, 'success');
         } catch (err) {
-          tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">فشل قراءة الملف.</div>';
+          tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">Fail to read file</div>';
           summaryCards.innerHTML = '';
           exportBtn.disabled = true;
           showMessage(err.message || String(err), 'error');
@@ -374,7 +798,7 @@
       fileInput.value = '';
       searchInput.value = '';
       summaryCards.innerHTML = '';
-      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">ارفع ملف Excel لعرض النتائج.</div>';
+      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400"></div>';
       exportBtn.disabled = true;
       showMessage('', 'info');
     });
@@ -392,9 +816,49 @@
       });
 
       const ws = XLSX.utils.json_to_sheet(exportData, { header: columns });
-      ws['!cols'] = columns.map(col => ({ wch: col === 'Agent name' ? 28 : Math.max(16, col.length + 2) }));
+
+      // Make exported Excel cleaner and easier to read.
+      ws['!cols'] = columns.map(col => {
+        if (col === 'Agent name') return { wch: 32 };
+        if (col === 'Idle Total') return { wch: 18 };
+        if (col === 'Busy') return { wch: 16 };
+        if (col === 'Training') return { wch: 16 };
+        if (col === 'Meal') return { wch: 16 };
+        if (col === 'Preparing') return { wch: 18 };
+        if (col === 'Total') return { wch: 18 };
+        return { wch: Math.max(18, col.length + 4) };
+      });
+
       const range = XLSX.utils.decode_range(ws['!ref']);
       ws['!autofilter'] = { ref: XLSX.utils.encode_range(range) };
+
+      // Freeze header row and first column in Excel-compatible viewers.
+      ws['!freeze'] = { xSplit: 1, ySplit: 1 };
+
+      // Header row styling. Some browser XLSX viewers ignore styles, but Excel keeps the structure.
+      for (let c = range.s.c; c <= range.e.c; c++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c });
+        if (!ws[cellAddress]) continue;
+        ws[cellAddress].s = {
+          font: { bold: true, sz: 14, color: { rgb: 'FFFFFF' } },
+          fill: { fgColor: { rgb: '1E3A8A' } },
+          alignment: { horizontal: 'center', vertical: 'center' }
+        };
+      }
+
+      // Center all duration columns and keep agent name left-aligned.
+      for (let r = range.s.r + 1; r <= range.e.r; r++) {
+        for (let c = range.s.c; c <= range.e.c; c++) {
+          const cellAddress = XLSX.utils.encode_cell({ r, c });
+          if (!ws[cellAddress]) continue;
+          ws[cellAddress].s = {
+            alignment: {
+              horizontal: c === 0 ? 'left' : 'center',
+              vertical: 'center'
+            }
+          };
+        }
+      }
 
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Agent Summary');
