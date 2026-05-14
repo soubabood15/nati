@@ -177,6 +177,26 @@
       box-shadow: 0 0 30px rgba(56, 189, 248, .28);
     }
 
+    body.dragging-file::before {
+      content: 'Drop Excel file anywhere';
+      position: fixed;
+      inset: 18px;
+      border: 2px dashed rgba(56, 189, 248, .8);
+      border-radius: 26px;
+      background: rgba(2, 6, 23, .58);
+      color: #bae6fd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: .03em;
+      z-index: 9998;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05), 0 0 40px rgba(56,189,248,.18);
+    }
+
     .tech-title {
       background: linear-gradient(90deg, #e0f2fe, #38bdf8, #22c55e);
       -webkit-background-clip: text;
@@ -772,22 +792,51 @@
       fileInput.click();
     });
 
+    function isExcelFile(file) {
+      if (!file) return false;
+      const name = file.name.toLowerCase();
+      return name.endsWith('.xlsx') || name.endsWith('.xls');
+    }
+
+    function handleDroppedFile(e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      document.body.classList.remove('dragging-file');
+
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!isExcelFile(file)) {
+        showMessage('Please drop an Excel file only (.xlsx or .xls).', 'error');
+        return;
+      }
+      handleExcelFile(file);
+    }
+
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
       dropZone.classList.add('dragover');
+      document.body.classList.add('dragging-file');
     });
 
     dropZone.addEventListener('dragleave', () => {
       dropZone.classList.remove('dragover');
     });
 
-    dropZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
+    dropZone.addEventListener('drop', handleDroppedFile);
 
-      const file = e.dataTransfer.files && e.dataTransfer.files[0];
-      handleExcelFile(file);
+    // Allow dropping the Excel file anywhere on the page, not only inside the upload box.
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      document.body.classList.add('dragging-file');
     });
+
+    document.addEventListener('dragleave', (e) => {
+      if (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight) {
+        document.body.classList.remove('dragging-file');
+        dropZone.classList.remove('dragover');
+      }
+    });
+
+    document.addEventListener('drop', handleDroppedFile);
 
     searchInput.addEventListener('input', renderTable);
 
