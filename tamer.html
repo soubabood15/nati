@@ -421,6 +421,7 @@
     let rawRows = [];
     let resultRows = [];
     let statusColumns = [];
+    let activeReadToken = 0;
 
     const fileInput = document.getElementById('fileInput');
     const exportBtn = document.getElementById('exportBtn');
@@ -759,28 +760,45 @@
       exportBtn.disabled = !resultRows.length;
     }
 
-    function handleExcelFile(file) {
+    async function handleExcelFile(file) {
       if (!file) return;
 
-      showMessage('Reading file  ...', 'info');
+      const readToken = ++activeReadToken;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const wb = XLSX.read(e.target.result, { type: 'array', cellDates: true });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-          processRows(rows);
-          renderAll();
-          showMessage(` Read sucssed  : ${resultRows.length} Agent  ${statusColumns.length} Status.`, 'success');
-        } catch (err) {
-          tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">Fail to read file</div>';
-          summaryCards.innerHTML = '';
-          exportBtn.disabled = true;
-          showMessage(err.message || String(err), 'error');
-        }
-      };
-      reader.readAsArrayBuffer(file);
+      // Clear previous file results immediately so Export never downloads old data.
+      rawRows = [];
+      resultRows = [];
+      statusColumns = [];
+      summaryCards.innerHTML = '';
+      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">Processing new file...</div>';
+      exportBtn.disabled = true;
+
+      showMessage(`Reading file: ${file.name} ...`, 'info');
+
+      try {
+        const buffer = await file.arrayBuffer();
+
+        // Ignore old reads if the user dropped/selected another file before this one finished.
+        if (readToken !== activeReadToken) return;
+
+        const wb = XLSX.read(buffer, { type: 'array', cellDates: true });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+        processRows(rows);
+        renderAll();
+        showMessage(`Read succeeded: ${resultRows.length} Agent, ${statusColumns.length} Status.`, 'success');
+      } catch (err) {
+        if (readToken !== activeReadToken) return;
+
+        tableWrap.innerHTML = '<div class="p-10 text-center text-red-500">Fail to read file</div>';
+        summaryCards.innerHTML = '';
+        exportBtn.disabled = true;
+        showMessage(err.message || String(err), 'error');
+      } finally {
+        // Allow selecting the same file again and make sure the input does not keep stale state.
+        fileInput.value = '';
+      }
     }
 
     fileInput.addEventListener('change', (event) => {
@@ -841,13 +859,14 @@
     searchInput.addEventListener('input', renderTable);
 
     clearBtn.addEventListener('click', () => {
+      activeReadToken++;
       rawRows = [];
       resultRows = [];
       statusColumns = [];
       fileInput.value = '';
       searchInput.value = '';
       summaryCards.innerHTML = '';
-      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400"></div>';
+      tableWrap.innerHTML = '<div class="p-10 text-center text-gray-400">Data</div>';
       exportBtn.disabled = true;
       showMessage('', 'info');
     });
