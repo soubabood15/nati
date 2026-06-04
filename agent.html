@@ -59,6 +59,14 @@
     border-color: rgba(147, 197, 253, 0.22);
   }
 
+  body.night-mode .search-box.open input,
+  body.night-mode .search-box.open input:focus {
+    background: rgba(15, 23, 42, 0.78);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.38);
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.45);
+  }
+
   body.night-mode .section h2 {
     color: #dbeafe;
     background: rgba(96, 165, 250, 0.16);
@@ -100,15 +108,22 @@
   }
 
   .search-box {
-    width: min(720px, 100%);
+    width: 58px;
+    height: 58px;
     margin: 0 auto;
     position: relative;
+    transition: width 0.35s ease;
+  }
+
+  .search-box.open {
+    width: min(720px, 100%);
   }
 
   .search-box input {
     width: 100%;
+    height: 58px;
     border: 2px solid rgba(40, 94, 255, 0.18);
-    border-radius: 18px;
+    border-radius: 999px;
     padding: 16px 52px 16px 18px;
     font-size: 16px;
     font-weight: 700;
@@ -117,11 +132,24 @@
     background: rgba(255, 255, 255, 0.72);
     box-shadow: 0 8px 22px rgba(40, 94, 255, 0.10);
     backdrop-filter: blur(14px);
-    transition: 0.25s ease;
+    transition: 0.35s ease;
     box-sizing: border-box;
+    cursor: pointer;
   }
 
-  .search-box input:focus {
+  .search-box:not(.open) input {
+    color: transparent;
+    padding-left: 0;
+    caret-color: transparent;
+  }
+
+  .search-box.open input {
+    cursor: text;
+    color: #1d2b5c;
+    caret-color: auto;
+  }
+
+  .search-box.open input:focus {
     border-color: rgba(40, 94, 255, 0.42);
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 12px 30px rgba(40, 94, 255, 0.18);
@@ -135,6 +163,19 @@
     transform: translateY(-50%);
     font-size: 20px;
     z-index: 1;
+    pointer-events: none;
+  }
+
+  .search-box:not(.open) input::placeholder {
+    color: transparent;
+  }
+
+  .search-box.open input::placeholder {
+    color: rgba(29, 43, 92, 0.45);
+  }
+
+  body.night-mode .search-box.open input::placeholder {
+    color: rgba(219, 234, 254, 0.5);
   }
 
   .no-results {
@@ -293,6 +334,114 @@
     background: rgba(107, 114, 128, 0.12);
     color: #4b5563;
     border: 1px solid rgba(107, 114, 128, 0.22);
+  }
+
+  .feedback-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .feedback-btn {
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+    background: rgba(255,255,255,0.7);
+    color: #1d2b5c;
+  }
+
+  .feedback-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.95);
+  }
+
+  .feedback-btn.like {
+    border-color: rgba(16, 185, 129, 0.28);
+  }
+
+  .feedback-btn.dislike {
+    border-color: rgba(239, 68, 68, 0.28);
+  }
+
+  .feedback-form {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .feedback-form.show {
+    display: flex;
+  }
+
+  .feedback-form textarea {
+    width: 100%;
+    min-height: 90px;
+    border-radius: 14px;
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    padding: 12px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 14px;
+    color: #1d2b5c;
+    background: rgba(255,255,255,0.75);
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  .feedback-submit {
+    align-self: flex-start;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: #2563eb;
+    color: white;
+    font-weight: 900;
+    cursor: pointer;
+  }
+
+  .feedback-message {
+    display: none;
+    font-size: 13px;
+    font-weight: 900;
+    color: #059669;
+  }
+
+  .feedback-message.show {
+    display: block;
+  }
+
+  .export-feedback-btn {
+    border: 2px solid rgba(16, 185, 129, 0.22);
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .export-feedback-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(16, 185, 129, 0.2);
+  }
+
+  body.night-mode .feedback-btn,
+  body.night-mode .feedback-form textarea {
+    background: rgba(15, 23, 42, 0.62);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .export-feedback-btn {
+    color: #d1fae5;
   }
 
   body.night-mode .severity-high,
@@ -776,11 +925,11 @@
 
 <body>
 
-<button class="theme-toggle" id="themeToggle" type="button">🌙 Night</button>
+<button class="theme-toggle" id="themeToggle" type="button">🌙 </button>
 
 <div class="search-wrapper">
   <div class="search-box">
-    <input type="text" id="knowledgeSearch" placeholder="ابحث عن مشكلة، قروب، أو سكربت...">
+    <input type="text" id="knowledgeSearch" placeholder="Search....">
   </div>
   <div class="no-results" id="noResults">ما في نتائج مطابقة</div>
 </div>
@@ -789,6 +938,7 @@
   <div class="mini-panel">
     <h3>⭐ Quick Access</h3>
     <div class="mini-list" id="quickAccessList"></div>
+    <button class="export-feedback-btn" id="exportFeedbackBtn" type="button">Export Local Backup</button>
   </div>
 
   <div class="mini-panel">
@@ -1012,16 +1162,19 @@
   const actionButtons = document.querySelectorAll('.action-btn');
   const quickAccessList = document.getElementById('quickAccessList');
   const recentList = document.getElementById('recentList');
+  const exportFeedbackBtn = document.getElementById('exportFeedbackBtn');
+  let currentCaseButton = null;
+  const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxNSEVdFE1aNzCTVxvElEuIKmsaqneYdnFyl-k1-5gJCUJJdJxkJf4p8Y8nh86cFceqdQ/exec';
 
   const themeToggle = document.getElementById('themeToggle');
 
   function applyTheme(mode) {
     if (mode === 'night') {
       document.body.classList.add('night-mode');
-      themeToggle.textContent = '☀️ Light';
+      themeToggle.textContent = '   🌙   ';
     } else {
       document.body.classList.remove('night-mode');
-      themeToggle.textContent = '🌙 Night';
+      themeToggle.textContent = '   ☀️   ';
     }
   }
 
@@ -1086,6 +1239,7 @@
 
   function openCaseFromButton(button) {
     if (!button) return;
+    currentCaseButton = button;
 
     const title = button.dataset.title || button.textContent;
     const desc = button.dataset.desc || 'لا يوجد شرح مضاف لهذا الزر.';
@@ -1096,6 +1250,7 @@
 
     popupTitle.textContent = title;
     popupDesc.innerHTML = buildPopupCards(desc, severity, escalation, refund);
+    attachFeedbackHandlers();
 
     if (img.trim() !== '') {
       popupImage.src = img;
@@ -1163,6 +1318,23 @@
   renderRecentCases();
 
   const searchInput = document.getElementById('knowledgeSearch');
+
+  const searchBox = searchInput.closest('.search-box');
+
+  searchBox.addEventListener('click', () => {
+    searchBox.classList.add('open');
+    searchInput.focus();
+  });
+
+  searchInput.addEventListener('focus', () => {
+    searchBox.classList.add('open');
+  });
+
+  searchInput.addEventListener('blur', () => {
+    if (searchInput.value.trim() === '') {
+      searchBox.classList.remove('open');
+    }
+  });
   const noResults = document.getElementById('noResults');
   const sections = document.querySelectorAll('.section');
   const groupBoxes = document.querySelectorAll('.group-box');
@@ -1319,6 +1491,110 @@
   searchInput.addEventListener('input', filterKnowledgeBase);
   // --- Search code end ---
 
+  async function saveCaseFeedback(type, note = '') {
+    if (!currentCaseButton) return;
+
+    const feedbackItem = {
+      date: new Date().toISOString(),
+      caseTitle: currentCaseButton.dataset.title || currentCaseButton.textContent.trim(),
+      visibleName: currentCaseButton.textContent.trim(),
+      rating: type,
+      feedback: note,
+      severity: currentCaseButton.dataset.severity || 'Low',
+      escalation: currentCaseButton.dataset.escalation || 'No',
+      refund: currentCaseButton.dataset.refund || 'No'
+    };
+
+    const feedback = JSON.parse(localStorage.getItem('caseFeedback') || '[]');
+    feedback.push(feedbackItem);
+    localStorage.setItem('caseFeedback', JSON.stringify(feedback));
+
+    if (!GOOGLE_SHEET_WEB_APP_URL) return;
+
+    try {
+      await fetch(GOOGLE_SHEET_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(feedbackItem)
+      });
+    } catch (error) {
+      console.error('Google Sheet feedback send failed:', error);
+    }
+  }
+
+  function attachFeedbackHandlers() {
+    const likeBtn = document.getElementById('caseLikeBtn');
+    const dislikeBtn = document.getElementById('caseDislikeBtn');
+    const feedbackForm = document.getElementById('feedbackForm');
+    const feedbackText = document.getElementById('feedbackText');
+    const submitFeedback = document.getElementById('submitFeedback');
+    const feedbackMessage = document.getElementById('feedbackMessage');
+
+    if (!likeBtn || !dislikeBtn || !feedbackForm || !feedbackText || !submitFeedback) return;
+
+    likeBtn.addEventListener('click', () => {
+      saveCaseFeedback('Like');
+      feedbackForm.classList.remove('show');
+      feedbackMessage.textContent = 'Thanks, feedback saved.';
+      feedbackMessage.classList.add('show');
+    });
+
+    dislikeBtn.addEventListener('click', () => {
+      feedbackForm.classList.add('show');
+      feedbackText.focus();
+      feedbackMessage.classList.remove('show');
+    });
+
+    submitFeedback.addEventListener('click', () => {
+      const note = feedbackText.value.trim();
+      saveCaseFeedback('Dislike', note || 'No comment provided');
+      feedbackText.value = '';
+      feedbackForm.classList.remove('show');
+      feedbackMessage.textContent = 'Thanks, feedback saved.';
+      feedbackMessage.classList.add('show');
+    });
+  }
+
+  function exportFeedbackSheet() {
+    const feedback = JSON.parse(localStorage.getItem('caseFeedback') || '[]');
+
+    if (feedback.length === 0) {
+      alert('No feedback saved yet.');
+      return;
+    }
+
+    const headers = ['Date', 'Case Title', 'Visible Name', 'Rating', 'Feedback', 'Priority', 'Escalation', 'Refund'];
+    const rows = feedback.map((item) => [
+      item.date,
+      item.caseTitle,
+      item.visibleName,
+      item.rating,
+      item.feedback,
+      item.severity,
+      item.escalation,
+      item.refund
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell || '').replaceAll('"', '""')}"`).join(','))
+      .join('\n');
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `knowledge-feedback-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  exportFeedbackBtn.addEventListener('click', exportFeedbackSheet);
+
   function buildPopupCards(description, severity = 'Low', escalation = 'No', refund = 'No') {
     const cleanDescription = description.replaceAll('\\n', '\n');
     const lines = cleanDescription
@@ -1336,6 +1612,19 @@
         <span class="severity-badge ${severityClass}">Priority: ${severity}</span>
         <span class="escalation-badge ${escalationClass}">Escalation: ${escalation}</span>
         <span class="refund-badge ${refundClass}">Refund: ${refund}</span>
+      </div>
+
+      <div class="info-card">
+        <span class="info-card-title">Was this case helpful?</span>
+        <div class="feedback-row">
+          <button class="feedback-btn like" id="caseLikeBtn" type="button">👍 Like</button>
+          <button class="feedback-btn dislike" id="caseDislikeBtn" type="button">👎 Dislike</button>
+        </div>
+        <div class="feedback-form" id="feedbackForm">
+          <textarea id="feedbackText" placeholder="اكتب ملاحظتك: شو الغلط أو شو لازم يتعدل؟"></textarea>
+          <button class="feedback-submit" id="submitFeedback" type="button">Save Feedback</button>
+        </div>
+        <div class="feedback-message" id="feedbackMessage">Thanks, feedback saved.</div>
       </div>
     `;
 
