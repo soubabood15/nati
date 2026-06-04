@@ -14,6 +14,86 @@
     color: #285eff;
   }
 
+  body.night-mode {
+    background: linear-gradient(135deg, #0f172a, #172554, #020617);
+    color: #dbeafe;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 18px;
+    left: 22px;
+    z-index: 9998;
+    border: 2px solid rgba(40, 94, 255, 0.22);
+    border-radius: 999px;
+    padding: 11px 18px;
+    background: rgba(255,255,255,0.78);
+    color: #1d2b5c;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(40, 94, 255, 0.16);
+    backdrop-filter: blur(14px);
+    transition: 0.25s ease;
+  }
+
+  .theme-toggle:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.95);
+  }
+
+  body.night-mode .theme-toggle {
+    background: rgba(15, 23, 42, 0.82);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.35);
+  }
+
+  body.night-mode .search-box input,
+  body.night-mode .section,
+  body.night-mode .action-btn,
+  body.night-mode .group-items,
+  body.night-mode .empty-state,
+  body.night-mode .no-results {
+    background: rgba(15, 23, 42, 0.62);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .section h2 {
+    color: #dbeafe;
+    background: rgba(96, 165, 250, 0.16);
+    border-color: rgba(147, 197, 253, 0.28);
+  }
+
+  body.night-mode .group-btn {
+    color: #dbeafe;
+  }
+
+  body.night-mode .popup-box {
+    background: rgba(15, 23, 42, 0.96);
+  }
+
+  body.night-mode .popup-header {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.94));
+    border-bottom-color: rgba(147, 197, 253, 0.18);
+  }
+
+  body.night-mode .popup-title,
+  body.night-mode .info-card-title {
+    color: #93c5fd;
+  }
+
+  body.night-mode .info-card,
+  body.night-mode .popup-image-box {
+    background: rgba(30, 41, 59, 0.82);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.18);
+  }
+
+  body.night-mode .reply-card {
+    background: rgba(6, 78, 59, 0.5);
+  }
+
   .search-wrapper {
     padding: 26px 30px 0;
     box-sizing: border-box;
@@ -72,6 +152,157 @@
 
   .no-results.show {
     display: block;
+  }
+
+  mark.search-highlight {
+    background: rgba(250, 204, 21, 0.65);
+    color: #1d2b5c;
+    padding: 1px 4px;
+    border-radius: 6px;
+  }
+
+  body.night-mode mark.search-highlight {
+    background: rgba(245, 158, 11, 0.8);
+    color: #ffffff;
+  }
+
+  .top-widgets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 18px 30px 0;
+    box-sizing: border-box;
+  }
+
+  .mini-panel {
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(40, 94, 255, 0.16);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 8px 22px rgba(40, 94, 255, 0.09);
+    backdrop-filter: blur(14px);
+  }
+
+  .mini-panel h3 {
+    margin: 0 0 12px;
+    color: #1f4eff;
+    font-size: 17px;
+    font-weight: 900;
+  }
+
+  .mini-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .mini-chip {
+    border: 2px solid rgba(40, 94, 255, 0.18);
+    background: rgba(255, 255, 255, 0.66);
+    color: #1d2b5c;
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .mini-chip:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .mini-empty {
+    color: rgba(29, 43, 92, 0.55);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  body.night-mode .mini-panel,
+  body.night-mode .mini-chip {
+    background: rgba(15, 23, 42, 0.62);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .mini-panel h3 {
+    color: #93c5fd;
+  }
+
+  body.night-mode .mini-empty {
+    color: rgba(219, 234, 254, 0.6);
+  }
+
+  .case-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .severity-badge,
+  .escalation-badge,
+  .refund-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 13px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .severity-high {
+    background: rgba(239, 68, 68, 0.14);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.24);
+  }
+
+  .severity-medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.26);
+  }
+
+  .severity-low {
+    background: rgba(16, 185, 129, 0.14);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.24);
+  }
+
+  .escalation-yes {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.22);
+  }
+
+  .escalation-no {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+  }
+
+  .refund-yes {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.22);
+  }
+
+  .refund-no {
+    background: rgba(107, 114, 128, 0.12);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, 0.22);
+  }
+
+  body.night-mode .severity-high,
+  body.night-mode .severity-medium,
+  body.night-mode .severity-low,
+  body.night-mode .escalation-yes,
+  body.night-mode .escalation-no,
+  body.night-mode .refund-yes,
+  body.night-mode .refund-no {
+    color: #dbeafe;
   }
 
   .section.hidden-by-search,
@@ -496,6 +727,11 @@
       padding: 18px 18px 0;
     }
 
+    .top-widgets {
+      grid-template-columns: 1fr;
+      padding: 14px 18px 0;
+    }
+
     .section {
       min-height: 420px;
     }
@@ -526,6 +762,13 @@
       min-height: 190px;
       max-height: 240px;
     }
+
+    .theme-toggle {
+      position: static;
+      display: block;
+      margin: 14px auto 0;
+      width: calc(100% - 36px);
+    }
   }
   
 </style>
@@ -533,11 +776,25 @@
 
 <body>
 
+<button class="theme-toggle" id="themeToggle" type="button">🌙 Night</button>
+
 <div class="search-wrapper">
   <div class="search-box">
     <input type="text" id="knowledgeSearch" placeholder="ابحث عن مشكلة، قروب، أو سكربت...">
   </div>
   <div class="no-results" id="noResults">ما في نتائج مطابقة</div>
+</div>
+
+<div class="top-widgets">
+  <div class="mini-panel">
+    <h3>⭐ Quick Access</h3>
+    <div class="mini-list" id="quickAccessList"></div>
+  </div>
+
+  <div class="mini-panel">
+    <h3>🕒 Recently Opened</h3>
+    <div class="mini-list" id="recentList"></div>
+  </div>
 </div>
 
 <div class="main-sections">
@@ -753,6 +1010,157 @@
   const popupImage = document.getElementById('popupImage');
   const closePopup = document.getElementById('closePopup');
   const actionButtons = document.querySelectorAll('.action-btn');
+  const quickAccessList = document.getElementById('quickAccessList');
+  const recentList = document.getElementById('recentList');
+
+  const themeToggle = document.getElementById('themeToggle');
+
+  function applyTheme(mode) {
+    if (mode === 'night') {
+      document.body.classList.add('night-mode');
+      themeToggle.textContent = '☀️ Light';
+    } else {
+      document.body.classList.remove('night-mode');
+      themeToggle.textContent = '🌙 Night';
+    }
+  }
+
+  const savedTheme = localStorage.getItem('knowledgeTheme') || 'light';
+  applyTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const isNight = document.body.classList.toggle('night-mode');
+    const newTheme = isNight ? 'night' : 'light';
+    localStorage.setItem('knowledgeTheme', newTheme);
+    applyTheme(newTheme);
+  });
+
+  function getSeverityFromButton(button) {
+    const text = `${button.dataset.title || ''} ${button.dataset.desc || ''}`.toLowerCase();
+    if (text.includes('payment') || text.includes('refund') || text.includes('not received') || text.includes('damaged') || text.includes('wrong order') || text.includes('مبلغ') || text.includes('استرجاع') || text.includes('لم يستلمه')) {
+      return 'High';
+    }
+    if (text.includes('late') || text.includes('missing') || text.includes('unavailable') || text.includes('cancel') || text.includes('تأخير') || text.includes('ناقص') || text.includes('إلغاء')) {
+      return 'Medium';
+    }
+    return 'Low';
+  }
+
+  function getEscalationFromButton(button) {
+    const text = `${button.dataset.title || ''} ${button.dataset.desc || ''}`.toLowerCase();
+    if (text.includes('payment') || text.includes('refund') || text.includes('not received') || text.includes('صعّد') || text.includes('ارفع') || text.includes('الدعم التقني') || text.includes('المدفوعات') || text.includes('المالية')) {
+      return 'Yes';
+    }
+    return 'No';
+  }
+
+  function getRefundFromButton(button) {
+    const text = `${button.dataset.title || ''} ${button.dataset.desc || ''}`.toLowerCase();
+
+    if (
+      text.includes('refund') ||
+      text.includes('استرجاع') ||
+      text.includes('missing item') ||
+      text.includes('wrong order') ||
+      text.includes('damaged') ||
+      text.includes('مبلغ') ||
+      text.includes('ناقص') ||
+      text.includes('تالف')
+    ) {
+      return 'Yes';
+    }
+
+    return 'No';
+  }
+
+  actionButtons.forEach((button, index) => {
+    button.dataset.caseId = button.dataset.caseId || `case-${index}`;
+    button.dataset.severity = button.dataset.severity || getSeverityFromButton(button);
+    button.dataset.escalation = button.dataset.escalation || getEscalationFromButton(button);
+    button.dataset.refund = button.dataset.refund || getRefundFromButton(button);
+  });
+
+  function findButtonByTitle(title) {
+    return Array.from(actionButtons).find((button) => (button.dataset.title || button.textContent) === title);
+  }
+
+  function openCaseFromButton(button) {
+    if (!button) return;
+
+    const title = button.dataset.title || button.textContent;
+    const desc = button.dataset.desc || 'لا يوجد شرح مضاف لهذا الزر.';
+    const img = button.dataset.img || '';
+    const severity = button.dataset.severity || 'Low';
+    const escalation = button.dataset.escalation || 'No';
+    const refund = button.dataset.refund || 'No';
+
+    popupTitle.textContent = title;
+    popupDesc.innerHTML = buildPopupCards(desc, severity, escalation, refund);
+
+    if (img.trim() !== '') {
+      popupImage.src = img;
+      popupImageBox.classList.add('has-image');
+    } else {
+      popupImage.removeAttribute('src');
+      popupImageBox.classList.remove('has-image');
+    }
+
+    saveRecentCase(title);
+    renderRecentCases();
+    popupOverlay.classList.add('active');
+  }
+
+  function saveRecentCase(title) {
+    let recent = JSON.parse(localStorage.getItem('recentCases') || '[]');
+    recent = recent.filter((item) => item !== title);
+    recent.unshift(title);
+    recent = recent.slice(0, 5);
+    localStorage.setItem('recentCases', JSON.stringify(recent));
+  }
+
+  function renderRecentCases() {
+    const recent = JSON.parse(localStorage.getItem('recentCases') || '[]');
+    recentList.innerHTML = '';
+
+    if (recent.length === 0) {
+      recentList.innerHTML = '<div class="mini-empty">No recently opened cases yet</div>';
+      return;
+    }
+
+    recent.forEach((title) => {
+      const chip = document.createElement('button');
+      chip.className = 'mini-chip';
+      chip.type = 'button';
+      chip.textContent = title;
+      chip.addEventListener('click', () => openCaseFromButton(findButtonByTitle(title)));
+      recentList.appendChild(chip);
+    });
+  }
+
+  function renderQuickAccess() {
+    const importantCases = Array.from(actionButtons)
+      .filter((button) => (button.dataset.severity || '').toLowerCase() === 'high' || (button.dataset.escalation || '').toLowerCase() === 'yes')
+      .slice(0, 6);
+
+    quickAccessList.innerHTML = '';
+
+    if (importantCases.length === 0) {
+      quickAccessList.innerHTML = '<div class="mini-empty">No quick access cases yet</div>';
+      return;
+    }
+
+    importantCases.forEach((button) => {
+      const chip = document.createElement('button');
+      chip.className = 'mini-chip';
+      chip.type = 'button';
+      chip.textContent = button.textContent.trim();
+      chip.addEventListener('click', () => openCaseFromButton(button));
+      quickAccessList.appendChild(chip);
+    });
+  }
+
+  renderQuickAccess();
+  renderRecentCases();
 
   const searchInput = document.getElementById('knowledgeSearch');
   const noResults = document.getElementById('noResults');
@@ -777,6 +1185,34 @@
   });
 
   // --- Search code start ---
+  function clearHighlights() {
+    actionButtons.forEach((button) => {
+      if (button.dataset.originalText) {
+        button.innerHTML = button.dataset.originalText;
+      }
+    });
+  }
+
+  function highlightButtonText(button, query) {
+    if (!query) return;
+    if (!button.dataset.originalText) {
+      button.dataset.originalText = button.textContent.trim();
+    }
+
+    const original = button.dataset.originalText;
+    const normalizedOriginal = normalizeText(original);
+    const index = normalizedOriginal.indexOf(query);
+
+    if (index === -1) {
+      button.textContent = original;
+      return;
+    }
+
+    const before = original.slice(0, index);
+    const match = original.slice(index, index + query.length);
+    const after = original.slice(index + query.length);
+    button.innerHTML = `${before}<mark class="search-highlight">${match}</mark>${after}`;
+  }
   function normalizeText(text) {
     return (text || '')
       .toLowerCase()
@@ -797,6 +1233,7 @@
 
   function filterKnowledgeBase() {
     const query = normalizeText(searchInput.value);
+    clearHighlights();
     let anyResult = false;
 
     groupBoxes.forEach((group) => {
@@ -817,6 +1254,7 @@
 
     if (query === '') {
       noResults.classList.remove('show');
+      clearHighlights();
       return;
     }
 
@@ -835,6 +1273,7 @@
 
           if (buttonMatches || groupMatches || sectionTitle.includes(query)) {
             button.classList.remove('hidden-by-search');
+            highlightButtonText(button, query);
             groupHasResult = true;
           } else {
             button.classList.add('hidden-by-search');
@@ -880,7 +1319,7 @@
   searchInput.addEventListener('input', filterKnowledgeBase);
   // --- Search code end ---
 
-  function buildPopupCards(description) {
+  function buildPopupCards(description, severity = 'Low', escalation = 'No', refund = 'No') {
     const cleanDescription = description.replaceAll('\\n', '\n');
     const lines = cleanDescription
       .split('\n')
@@ -888,6 +1327,17 @@
       .filter(line => line !== '');
 
     let html = '';
+    const severityClass = `severity-${severity.toLowerCase()}`;
+    const escalationClass = escalation.toLowerCase() === 'yes' ? 'escalation-yes' : 'escalation-no';
+    const refundClass = refund.toLowerCase() === 'yes' ? 'refund-yes' : 'refund-no';
+
+    html += `
+      <div class="case-meta-row">
+        <span class="severity-badge ${severityClass}">Priority: ${severity}</span>
+        <span class="escalation-badge ${escalationClass}">Escalation: ${escalation}</span>
+        <span class="refund-badge ${refundClass}">Refund: ${refund}</span>
+      </div>
+    `;
 
     lines.forEach((line) => {
       if (line.startsWith('المشكلة:')) {
@@ -927,22 +1377,7 @@
 
   actionButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      const title = button.dataset.title || button.textContent;
-      const desc = button.dataset.desc || 'لا يوجد شرح مضاف لهذا الزر.';
-      const img = button.dataset.img || '';
-
-      popupTitle.textContent = title;
-      popupDesc.innerHTML = buildPopupCards(desc);
-
-      if (img.trim() !== '') {
-        popupImage.src = img;
-        popupImageBox.classList.add('has-image');
-      } else {
-        popupImage.removeAttribute('src');
-        popupImageBox.classList.remove('has-image');
-      }
-
-      popupOverlay.classList.add('active');
+      openCaseFromButton(button);
     });
   });
 
