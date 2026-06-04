@@ -1,63 +1,488 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>Agent</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Service Knowledge Base</title>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f7fbff, #eef5ff);
+    color: #285eff;
+  }
+
+  .main-sections {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 30px;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .section {
+    min-height: calc(100vh - 60px);
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    padding: 24px;
+    backdrop-filter: blur(14px);
+    transition: 0.35s ease;
+  }
+
+  .section:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(80, 150, 255, 0.35);
+  }
+
+  .section h2 {
+    text-align: center;
+    color: #1f4eff;
+    margin: 0 0 18px;
+    font-size: 24px;
+    font-weight: 800;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(40, 94, 255, 0.12);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    box-shadow: 0 4px 12px rgba(40, 94, 255, 0.12);
+  }
+
+  .empty-box {
+    height: calc(100vh - 165px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+  }
+
+  .action-btn {
+    width: 100%;
+    background: rgba(255,255,255,0.55);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1d2b5c;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 3px solid transparent;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: rgba(255,255,255,0.9);
+  }
+
+  .btn1 { border-color: #3b82f6; }
+  .btn2 { border-color: #8b5cf6; }
+  .btn3 { border-color: #10b981; }
+  .btn4 { border-color: #f59e0b; }
+  .btn5 { border-color: #ef4444; }
+  .btn6 { border-color: #06b6d4; }
+
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 35px 20px;
+    z-index: 9999;
+    overflow-y: auto;
+  }
+
+  .popup-overlay.active {
+    display: flex;
+  }
+
+  .popup-box {
+    width: min(850px, 100%);
+    max-height: calc(100vh - 70px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 24px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(18px);
+    padding: 0;
+    animation: popupShow 0.25s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes popupShow {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(40, 94, 255, 0.12);
+    background: linear-gradient(135deg, rgba(247, 251, 255, 0.98), rgba(238, 245, 255, 0.92));
+    flex-shrink: 0;
+  }
+
+  .popup-title {
+    margin: 0;
+    color: #1f4eff;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .close-popup {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .close-popup:hover {
+    background: rgba(239, 68, 68, 0.22);
+    transform: rotate(90deg);
+  }
+
+  .popup-content {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 18px;
+    padding: 22px 24px 24px;
+    overflow-y: auto;
+  }
+
+  .popup-text {
+    min-height: 230px;
+    max-height: calc(100vh - 205px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-left: 4px;
+  }
+
+  .info-card {
+    background: rgba(247, 251, 255, 0.95);
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    border-radius: 16px;
+    padding: 14px 16px;
+    color: #1d2b5c;
+    line-height: 1.7;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 5px 14px rgba(40, 94, 255, 0.08);
+  }
+
+  .info-card.issue-card {
+    border-right: 5px solid #ef4444;
+  }
+
+  .info-card.step-card {
+    border-right: 5px solid #3b82f6;
+  }
+
+  .info-card.reply-card {
+    border-right: 5px solid #10b981;
+    background: rgba(236, 253, 245, 0.9);
+  }
+
+  .info-card-title {
+    display: block;
+    margin-bottom: 6px;
+    color: #1f4eff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .step-card .info-card-title {
+    color: #2563eb;
+  }
+
+  .reply-card .info-card-title {
+    color: #059669;
+  }
+
+  .popup-image-box {
+    height: 100%;
+    min-height: 260px;
+    max-height: calc(100vh - 205px);
+    border: 2px dashed rgba(40, 94, 255, 0.28);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: rgba(40, 94, 255, 0.45);
+    font-weight: 800;
+    text-align: center;
+    position: sticky;
+    top: 0;
+  }
+
+  .popup-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+  }
+
+  .popup-image-box.has-image img {
+    display: block;
+  }
+
+  .popup-image-box.has-image span {
+    display: none;
+  }
+
+  .popup-text::-webkit-scrollbar,
+  .popup-content::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .popup-text::-webkit-scrollbar-thumb,
+  .popup-content::-webkit-scrollbar-thumb {
+    background: rgba(40, 94, 255, 0.25);
+    border-radius: 20px;
+  }
+
+  .popup-text::-webkit-scrollbar-track,
+  .popup-content::-webkit-scrollbar-track {
+    background: rgba(40, 94, 255, 0.06);
+    border-radius: 20px;
+  }
+
+  @media (max-width: 1200px) {
+    .main-sections {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 700px) {
+    .main-sections {
+      grid-template-columns: 1fr;
+      padding: 18px;
+    }
+
+    .section {
+      min-height: 420px;
+    }
+
+    .empty-box {
+      height: 300px;
+    }
+
+    .popup-content {
+      grid-template-columns: 1fr;
+    }
+
+    .popup-box {
+      max-height: calc(100vh - 35px);
+      border-radius: 20px;
+    }
+
+    .popup-content {
+      padding: 18px;
+    }
+
+    .popup-text {
+      max-height: none;
+    }
+
+    .popup-image-box {
+      position: relative;
+      min-height: 190px;
+      max-height: 240px;
+    }
+  }
+</style>
 </head>
 
 <body>
 
-<h1>صفحة الإيجنت</h1>
+<div class="main-sections">
 
-<div id="content"></div>
+  <div class="section">
+    <h2>Merchant Issue</h2>
+    <div class="empty-box">
+      <button class="action-btn btn1" data-title="Merchant - Order Not Confirmed" data-desc="المشكلة: الطلب ظاهر للعميل لكن لم يصل تأكيد للمطعم.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب في النظام.\n2. تأكد هل الطلب Pending أو Accepted أو Cancelled.\n3. تواصل مع المطعم للتأكيد إن كان الطلب ظاهر لديهم.\n4. إذا لم يظهر الطلب، ارفع الحالة للدعم التقني مع رقم الطلب.\n\nرد مقترح: شكراً لتواصلك معنا، سنقوم بالتحقق من حالة الطلب فوراً والتأكد من وصوله للمطعم، وسيتم تحديثك بأقرب وقت." data-img="">Order Not Confirmed</button>
+      <button class="action-btn btn2" data-title="Merchant - Item Unavailable" data-desc="المشكلة: صنف من الطلب غير متوفر لدى المطعم.\n\nخطوات التعامل:\n1. تأكد من الصنف غير المتوفر.\n2. اسأل العميل إن كان يرغب باستبدال الصنف أو إلغائه.\n3. حدّث الطلب حسب سياسة الشركة.\n4. اطلب من المطعم تحديث المنيو لتجنب تكرار المشكلة.\n\nرد مقترح: نعتذر، أحد الأصناف غير متوفر حالياً. يمكننا مساعدتك باستبداله أو تعديل الطلب حسب رغبتك." data-img="">Item Unavailable</button>
+      <button class="action-btn btn3" data-title="Merchant - Wrong Preparation Time" data-desc="المشكلة: المطعم وضع وقت تحضير غير دقيق أو تأخر بالتحضير.\n\nخطوات التعامل:\n1. تحقق من وقت التحضير المسجل.\n2. اتصل بالمطعم لمعرفة الوقت الحقيقي.\n3. حدّث العميل والكابتن بالوقت الجديد.\n4. إذا كان التأخير كبيراً، طبّق سياسة التعويض أو الإلغاء حسب الحالة.\n\nرد مقترح: نعتذر عن التأخير، تم التواصل مع المطعم للتأكد من الوقت المتوقع وسنوافيك بالتحديث مباشرة." data-img="">Preparation Delay</button>
+      <button class="action-btn btn4" data-title="Merchant - Missing Item" data-desc="المشكلة: العميل استلم الطلب ويوجد صنف ناقص.\n\nخطوات التعامل:\n1. اطلب من العميل صورة للفاتورة أو الطلب المستلم إن أمكن.\n2. تحقق من تفاصيل الطلب الأصلية.\n3. تواصل مع المطعم للتأكد.\n4. عالج الحالة حسب السياسة: إعادة إرسال الصنف، تعويض، أو رصيد.\n\nرد مقترح: نعتذر عن النقص في طلبك، سنراجع التفاصيل مع المطعم ونساعدك بالحل المناسب." data-img="">Missing Item</button>
+      <button class="action-btn btn5" data-title="Merchant - Store Closed" data-desc="المشكلة: المطعم ظاهر متاح في التطبيق لكنه مغلق فعلياً.\n\nخطوات التعامل:\n1. حاول التواصل مع المطعم.\n2. إذا لم يتم الرد، تحقق من آخر نشاط للمطعم في النظام.\n3. أبلغ فريق العمليات لتحديث حالة المطعم.\n4. أخبر العميل بالخيارات المتاحة حسب الطلب.\n\nرد مقترح: نعتذر، يبدو أن المطعم غير متاح حالياً. سنساعدك بإلغاء الطلب أو اختيار حل مناسب حسب الحالة." data-img="">Store Closed</button>
+      <button class="action-btn btn6" data-title="Merchant - Price Difference" data-desc="المشكلة: يوجد اختلاف بين سعر التطبيق وسعر المطعم.\n\nخطوات التعامل:\n1. تحقق من السعر الظاهر في التطبيق.\n2. قارن السعر مع تفاصيل الطلب والفاتورة إن وجدت.\n3. لا تطلب من العميل دفع فرق غير واضح بدون تحقق.\n4. ارفع الحالة للفريق المختص لتحديث الأسعار.\n\nرد مقترح: شكراً لتنبيهك، سنراجع فرق السعر ونتأكد من تطبيق الإجراء الصحيح حسب سياسة الشركة." data-img="">Price Difference</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Courier Issue</h2>
+    <div class="empty-box">
+      <button class="action-btn btn1" data-title="Courier - Driver Late" data-desc="المشكلة: الكابتن متأخر عن وقت الوصول المتوقع.\n\nخطوات التعامل:\n1. تحقق من موقع الكابتن الحالي.\n2. راجع وقت الاستلام ووقت التوصيل المتوقع.\n3. تواصل مع الكابتن إذا كان التأخير غير مبرر.\n4. حدّث العميل بوقت واقعي وواضح.\n\nرد مقترح: نعتذر عن التأخير، يتم الآن متابعة موقع الكابتن وسنقوم بتحديثك بوقت الوصول المتوقع." data-img="">Driver Late</button>
+      <button class="action-btn btn2" data-title="Courier - Cannot Reach Customer" data-desc="المشكلة: الكابتن لا يستطيع الوصول للعميل.\n\nخطوات التعامل:\n1. تحقق من رقم العميل والعنوان.\n2. اطلب من الكابتن محاولة الاتصال مرة أخرى.\n3. تواصل مع العميل من طرف الدعم إن لزم.\n4. وثّق المحاولات قبل أي إجراء إلغاء.\n\nرد مقترح: الكابتن يحاول التواصل معك لتسليم الطلب، يرجى التأكد من الهاتف والعنوان لتجنب تأخير التوصيل." data-img="">Cannot Reach Customer</button>
+      <button class="action-btn btn3" data-title="Courier - Wrong Location" data-desc="المشكلة: الكابتن ذهب إلى موقع خاطئ بسبب pin أو عنوان غير دقيق.\n\nخطوات التعامل:\n1. تحقق من العنوان المكتوب والـ pin.\n2. اطلب من العميل إرسال وصف واضح أو موقع صحيح.\n3. شارك التحديث مع الكابتن.\n4. إذا تغيرت منطقة التوصيل، راجع سياسة الرسوم أو الإلغاء.\n\nرد مقترح: لضمان وصول الطلب بسرعة، يرجى تزويدنا بوصف واضح للموقع أو تعديل الموقع الصحيح." data-img="">Wrong Location</button>
+      <button class="action-btn btn4" data-title="Courier - Order Damaged" data-desc="المشكلة: الطلب وصل بحالة غير سليمة.\n\nخطوات التعامل:\n1. اطلب صورة واضحة للطلب.\n2. تحقق من تفاصيل المطعم والكابتن.\n3. صنّف الحالة: تلف كامل أو جزئي.\n4. عالجها حسب السياسة: تعويض، إعادة طلب، أو تصعيد.\n\nرد مقترح: نعتذر عن وصول الطلب بهذه الحالة، يرجى إرسال صورة واضحة حتى نتمكن من مراجعة الحالة ومساعدتك." data-img="">Order Damaged</button>
+      <button class="action-btn btn5" data-title="Courier - Picked Wrong Order" data-desc="المشكلة: الكابتن استلم طلباً مختلفاً من المطعم.\n\nخطوات التعامل:\n1. تحقق من رقم الطلب الموجود مع الكابتن.\n2. تواصل مع المطعم للتأكد من الطلب الصحيح.\n3. أوقف التسليم إذا كان الطلب غير صحيح.\n4. نسّق إعادة الاستلام أو الحل المناسب.\n\nرد مقترح: يتم حالياً التحقق من الطلب مع الكابتن والمطعم لضمان تسليم الطلب الصحيح." data-img="">Wrong Order Picked</button>
+      <button class="action-btn btn6" data-title="Courier - Delivery Marked Completed" data-desc="المشكلة: الطلب ظاهر مكتمل لكن العميل يقول إنه لم يستلمه.\n\nخطوات التعامل:\n1. تحقق من وقت الإكمال وموقع الكابتن.\n2. تواصل مع الكابتن للتأكيد.\n3. اسأل العميل إن تم التسليم لشخص آخر في نفس الموقع.\n4. صعّد الحالة إذا لم يتم إثبات التسليم.\n\nرد مقترح: سنراجع تفاصيل التسليم مع الكابتن ونعود لك بالتحديث المناسب بأقرب وقت." data-img="">Completed Not Received</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Customer Issue</h2>
+    <div class="empty-box">
+      <button class="action-btn btn1" data-title="Customer - Wrong Order Received" data-desc="المشكلة: العميل استلم طلباً مختلفاً عن طلبه.\n\nخطوات التعامل:\n1. اطلب صورة للطلب المستلم والفاتورة إن وجدت.\n2. قارنها مع تفاصيل الطلب في النظام.\n3. تحقق هل الخطأ من المطعم أو الكابتن.\n4. طبّق الحل حسب السياسة: إعادة الطلب، تعويض، أو رصيد.\n\nرد مقترح: نعتذر عن الخطأ في الطلب، يرجى إرسال صورة للطلب المستلم حتى نتمكن من مساعدتك بسرعة." data-img="">Wrong Order</button>
+      <button class="action-btn btn2" data-title="Customer - Refund Request" data-desc="المشكلة: العميل يطلب استرجاع المبلغ.\n\nخطوات التعامل:\n1. حدد سبب طلب الاسترجاع.\n2. تحقق من حالة الطلب والدفع.\n3. راجع سياسة الاسترجاع حسب نوع المشكلة.\n4. وضّح للعميل مدة الاسترجاع المتوقعة.\n\nرد مقترح: تم استلام طلب الاسترجاع، سنراجع الحالة حسب السياسة وسيتم إبلاغك بالتحديث ومدة المعالجة." data-img="">Refund Request</button>
+      <button class="action-btn btn3" data-title="Customer - Payment Failed" data-desc="المشكلة: الدفع فشل أو تم خصم مبلغ دون تأكيد الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الدفع في النظام.\n2. تحقق هل تم إنشاء الطلب أم لا.\n3. إذا تم الخصم دون طلب، ارفع الحالة لفريق المدفوعات.\n4. أخبر العميل بمدة مراجعة الدفع.\n\nرد مقترح: نعتذر عن مشكلة الدفع، سنقوم بمراجعة العملية والتأكد من حالة المبلغ بأسرع وقت." data-img="">Payment Failed</button>
+      <button class="action-btn btn4" data-title="Customer - Change Address" data-desc="المشكلة: العميل يريد تغيير عنوان التوصيل بعد إنشاء الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب: قبل الاستلام أو بعد الاستلام.\n2. تحقق من قرب العنوان الجديد من نطاق التوصيل.\n3. تواصل مع الكابتن إن كان الطلب في الطريق.\n4. طبّق السياسة في حال وجود فرق منطقة أو رسوم.\n\nرد مقترح: يمكننا محاولة تحديث العنوان حسب حالة الطلب وموقع الكابتن، يرجى تزويدنا بالعنوان الجديد." data-img="">Change Address</button>
+      <button class="action-btn btn5" data-title="Customer - Cancel Order" data-desc="المشكلة: العميل يريد إلغاء الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب.\n2. إذا لم يبدأ التحضير، يمكن الإلغاء حسب السياسة.\n3. إذا بدأ التحضير أو تم الاستلام، وضّح القيود للعميل.\n4. وثّق سبب الإلغاء.\n\nرد مقترح: سنراجع حالة الطلب الآن، وإذا كان الإلغاء متاحاً حسب السياسة سنقوم بمساعدتك مباشرة." data-img="">Cancel Order</button>
+      <button class="action-btn btn6" data-title="Customer - Promo Code Issue" data-desc="المشكلة: كود الخصم لا يعمل أو لم يتم تطبيقه.\n\nخطوات التعامل:\n1. تحقق من صلاحية الكود.\n2. تأكد من شروط الاستخدام: الحد الأدنى، المطاعم المشمولة، أول طلب، أو تاريخ الانتهاء.\n3. إذا كانت الشروط صحيحة ولم يعمل الكود، صعّد الحالة.\n4. وضّح السبب للعميل بطريقة مختصرة.\n\nرد مقترح: سنراجع كود الخصم وشروطه، وإذا كان مستوفياً للشروط سنساعدك بالحل المناسب." data-img="">Promo Code</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>General</h2>
+    <div class="empty-box">
+      <button class="action-btn btn1" data-title="General - Escalation Rules" data-desc="متى يتم التصعيد؟\n\n1. مشكلة دفع أو مبلغ مخصوم.\n2. طلب مكتمل لكن العميل لم يستلمه.\n3. شكوى متكررة من نفس المطعم أو الكابتن.\n4. حالة تحتاج صلاحية غير متاحة للموظف.\n5. وجود ضرر واضح في تجربة العميل.\n\nمعلومة مهمة: التصعيد يجب أن يحتوي رقم الطلب، ملخص المشكلة، الإجراءات التي تمت، ولقطات أو صور إن وجدت." data-img="">Escalation Rules</button>
+      <button class="action-btn btn2" data-title="General - Tone of Voice" data-desc="أسلوب الرد المعتمد:\n\n1. اعتذار مختصر عند وجود مشكلة.\n2. لا تلوم العميل أو المطعم أو الكابتن مباشرة.\n3. استخدم جمل واضحة وقصيرة.\n4. أعطِ العميل خطوة تالية واضحة.\n5. لا تعد العميل بتعويض قبل التأكد من السياسة.\n\nمثال: نعتذر عن الإزعاج، سنراجع الحالة الآن ونعود لك بالتحديث المناسب." data-img="">Tone of Voice</button>
+      <button class="action-btn btn3" data-title="General - Required Information" data-desc="المعلومات المطلوبة قبل معالجة أي حالة:\n\n1. رقم الطلب.\n2. رقم هاتف العميل إن لزم.\n3. نوع المشكلة.\n4. صور أو إثباتات عند الحاجة.\n5. وقت حدوث المشكلة.\n6. الإجراء المطلوب من العميل.\n\nالهدف: تقليل الرجوع للعميل أكثر من مرة وتسريع الحل." data-img="">Required Info</button>
+      <button class="action-btn btn4" data-title="General - Compensation Check" data-desc="قبل التعويض تحقق من:\n\n1. هل المشكلة مثبتة؟\n2. هل يوجد صورة أو دليل؟\n3. هل الخطأ من المطعم أو الكابتن أو النظام؟\n4. هل العميل مؤهل حسب السياسة؟\n5. هل تم تعويض العميل سابقاً لنفس الطلب؟\n\nملاحظة: لا يتم ذكر قيمة التعويض قبل التأكد من السياسة والصلاحية." data-img="">Compensation Check</button>
+      <button class="action-btn btn5" data-title="General - Ticket Documentation" data-desc="طريقة توثيق التذكرة:\n\n1. اكتب ملخص المشكلة بجملة واحدة.\n2. أضف رقم الطلب.\n3. اذكر الطرف المتأثر: عميل، مطعم، كابتن.\n4. اذكر الإجراء الذي قمت به.\n5. أضف الخطوة التالية المطلوبة.\n\nمثال: العميل استلم طلب ناقص، تم طلب صورة والتواصل مع المطعم، بانتظار التأكيد." data-img="">Ticket Documentation</button>
+      <button class="action-btn btn6" data-title="General - Closing Script" data-desc="سكريبت إغلاق المحادثة:\n\nشكراً لتواصلك معنا، نعتذر مرة أخرى عن أي إزعاج حصل. تم اتخاذ الإجراء المناسب حسب الحالة، وإذا احتجت أي مساعدة إضافية نحن دائماً بخدمتك.\n\nمتى يستخدم؟\nبعد حل المشكلة أو توضيح الإجراء النهائي للعميل." data-img="">Closing Script</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-box">
+    <div class="popup-header">
+      <h3 class="popup-title" id="popupTitle">عنوان الشرح</h3>
+      <button class="close-popup" id="closePopup">×</button>
+    </div>
+
+    <div class="popup-content">
+      <div class="popup-text" id="popupDesc">
+        هنا يظهر شرح الزر.
+      </div>
+
+      <div class="popup-image-box" id="popupImageBox">
+        <span>مكان صورة المشكلة</span>
+        <img id="popupImage" src="" alt="صورة المشكلة">
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-// حماية الصفحة
-if (localStorage.getItem("logged_in") !== "true") {
-  window.location.href = "index.html";
-}
+  const popupOverlay = document.getElementById('popupOverlay');
+  const popupTitle = document.getElementById('popupTitle');
+  const popupDesc = document.getElementById('popupDesc');
+  const popupImageBox = document.getElementById('popupImageBox');
+  const popupImage = document.getElementById('popupImage');
+  const closePopup = document.getElementById('closePopup');
+  const actionButtons = document.querySelectorAll('.action-btn');
 
-// بيانات السكربتات
-const DATA = {
-  version: "1.0.0",
-  problems: [
-    {
-      name: "تأخير الطلب",
-      steps: [
-        {
-          name: "ترحيب",
-          scripts: [
-            { text: "أهلًا وسهلًا", rating: 5 }
-          ]
-        },
-        {
-          name: "اعتذار",
-          scripts: [
-            { text: "نعتذر عن التأخير", rating: 5 }
-          ]
-        }
-      ]
-    }
-  ]
-};
+  function buildPopupCards(description) {
+    const cleanDescription = description.replaceAll('\\n', '\n');
+    const lines = cleanDescription
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line !== '');
 
-// عرض بسيط
-const el = document.getElementById("content");
+    let html = '';
 
-DATA.problems.forEach(p => {
-  const div = document.createElement("div");
-  div.innerHTML = `<h3>${p.name}</h3>`;
+    lines.forEach((line) => {
+      if (line.startsWith('المشكلة:')) {
+        html += `
+          <div class="info-card issue-card">
+            <span class="info-card-title">المشكلة</span>
+            ${line.replace('المشكلة:', '').trim()}
+          </div>
+        `;
+      } else if (/^\d+\./.test(line)) {
+        const stepNumber = line.match(/^\d+/)[0];
+        const stepText = line.replace(/^\d+\.\s*/, '');
+        html += `
+          <div class="info-card step-card">
+            <span class="info-card-title">الخطوة ${stepNumber}</span>
+            ${stepText}
+          </div>
+        `;
+      } else if (line.startsWith('رد مقترح:')) {
+        html += `
+          <div class="info-card reply-card">
+            <span class="info-card-title">رد مقترح</span>
+            ${line.replace('رد مقترح:', '').trim()}
+          </div>
+        `;
+      } else if (!line.includes('خطوات التعامل')) {
+        html += `
+          <div class="info-card">
+            ${line}
+          </div>
+        `;
+      }
+    });
 
-  p.steps.forEach(s => {
-    div.innerHTML += `<b>${s.name}</b><br>`;
+    return html || '<div class="info-card">لا يوجد شرح مضاف لهذا الزر.</div>';
+  }
 
-    s.scripts.forEach(sc => {
-      div.innerHTML += `${sc.text} ⭐${sc.rating}<br>`;
+  actionButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const title = button.dataset.title || button.textContent;
+      const desc = button.dataset.desc || 'لا يوجد شرح مضاف لهذا الزر.';
+      const img = button.dataset.img || '';
+
+      popupTitle.textContent = title;
+      popupDesc.innerHTML = buildPopupCards(desc);
+
+      if (img.trim() !== '') {
+        popupImage.src = img;
+        popupImageBox.classList.add('has-image');
+      } else {
+        popupImage.removeAttribute('src');
+        popupImageBox.classList.remove('has-image');
+      }
+
+      popupOverlay.classList.add('active');
     });
   });
 
-  el.appendChild(div);
-});
+  closePopup.addEventListener('click', () => {
+    popupOverlay.classList.remove('active');
+  });
+
+  popupOverlay.addEventListener('click', (event) => {
+    if (event.target === popupOverlay) {
+      popupOverlay.classList.remove('active');
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      popupOverlay.classList.remove('active');
+    }
+  });
 </script>
 
 </body>
