@@ -37,6 +37,30 @@
     transition: 0.25s ease;
   }
 
+  .watermark {
+    position: fixed;
+    top: 18px;
+    right: 22px;
+    z-index: 9998;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    color: #1d2b5c;
+    font-size: 13px;
+    font-weight: 900;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 22px rgba(40,94,255,0.12);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  body.night-mode .watermark {
+    background: rgba(15, 23, 42, 0.72);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
   .theme-toggle:hover {
     transform: translateY(-2px);
     background: rgba(255,255,255,0.95);
@@ -102,13 +126,157 @@
     background: rgba(6, 78, 59, 0.5);
   }
 
+  .agent-login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(15, 23, 42, 0.56);
+    backdrop-filter: blur(12px);
+  }
+
+  .agent-login-overlay.show {
+    display: flex;
+  }
+
+  .agent-login-box {
+    width: min(420px, 100%);
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+    text-align: center;
+  }
+
+  .agent-login-box h2 {
+    margin: 0 0 10px;
+    color: #1f4eff;
+    font-size: 25px;
+    font-weight: 950;
+  }
+
+  .agent-login-box p {
+    margin: 0 0 18px;
+    color: rgba(29, 43, 92, 0.68);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .agent-login-box input {
+    width: 100%;
+    border: 2px solid rgba(40, 94, 255, 0.18);
+    border-radius: 16px;
+    padding: 14px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 850;
+    color: #1d2b5c;
+    background: rgba(255,255,255,0.86);
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .agent-login-box button {
+    width: 100%;
+    margin-top: 13px;
+    border: none;
+    border-radius: 16px;
+    padding: 13px;
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+    color: white;
+    font-size: 15px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.22s ease;
+  }
+
+  .agent-login-box button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(40, 94, 255, 0.22);
+  }
+
+  .agent-login-box button:disabled {
+    opacity: 0.72;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .login-error {
+    display: none;
+    margin-top: 12px;
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .login-error.show {
+    display: block;
+  }
+
+  .agent-name-display {
+    position: fixed;
+    top: 66px;
+    right: 22px;
+    z-index: 9998;
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.65);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    color: #1d2b5c;
+    font-size: 12px;
+    font-weight: 900;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 22px rgba(40,94,255,0.10);
+    min-width: 160px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .agent-name-display.typing::after {
+    content: "|";
+    margin-right: 3px;
+    animation: typingCursor 0.75s infinite;
+  }
+
+  @keyframes typingCursor {
+    0%, 45% { opacity: 1; }
+    46%, 100% { opacity: 0; }
+  }
+
+  body.night-mode .agent-login-box,
+  body.night-mode .agent-name-display {
+    background: rgba(15, 23, 42, 0.86);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .agent-login-box h2 {
+    color: #93c5fd;
+  }
+
+  body.night-mode .agent-login-box p,
+  body.night-mode .agent-login-box input {
+    color: #dbeafe;
+  }
+
+  body.night-mode .agent-login-box input {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
   .search-wrapper {
     padding: 26px 30px 0;
     box-sizing: border-box;
   }
 
   .search-box {
-    width: 58px;
+    width: 118px;
     height: 58px;
     margin: 0 auto;
     position: relative;
@@ -138,15 +306,17 @@
   }
 
   .search-box:not(.open) input {
-    color: transparent;
-    padding-left: 0;
+    color: #1d2b5c;
+    padding: 16px 22px;
     caret-color: transparent;
+    text-align: center;
   }
 
   .search-box.open input {
     cursor: text;
     color: #1d2b5c;
     caret-color: auto;
+    text-align: right;
   }
 
   .search-box.open input:focus {
@@ -155,19 +325,10 @@
     box-shadow: 0 12px 30px rgba(40, 94, 255, 0.18);
   }
 
-  .search-box::before {
-    content: "🔎";
-    position: absolute;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 20px;
-    z-index: 1;
-    pointer-events: none;
-  }
 
   .search-box:not(.open) input::placeholder {
-    color: transparent;
+    color: #1d2b5c;
+    opacity: 1;
   }
 
   .search-box.open input::placeholder {
@@ -176,6 +337,14 @@
 
   body.night-mode .search-box.open input::placeholder {
     color: rgba(219, 234, 254, 0.5);
+  }
+
+  body.night-mode .search-box:not(.open) input {
+    color: #dbeafe;
+  }
+
+  body.night-mode .search-box:not(.open) input::placeholder {
+    color: #dbeafe;
   }
 
   .no-results {
@@ -194,6 +363,7 @@
   .no-results.show {
     display: block;
   }
+
 
   mark.search-highlight {
     background: rgba(250, 204, 21, 0.65);
@@ -339,33 +509,89 @@
   .feedback-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 4px;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .agent-name-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .agent-name-input {
+    width: 100%;
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    color: #1d2b5c;
+    background: rgba(255,255,255,0.78);
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.2s ease;
+  }
+
+  .agent-name-input:focus {
+    border-color: rgba(40, 94, 255, 0.42);
+    box-shadow: 0 8px 20px rgba(40, 94, 255, 0.12);
+    background: rgba(255,255,255,0.96);
   }
 
   .feedback-btn {
-    border: 1px solid rgba(40, 94, 255, 0.18);
-    border-radius: 999px;
-    padding: 9px 14px;
-    font-size: 13px;
-    font-weight: 900;
+    min-width: 132px;
+    border: none;
+    border-radius: 18px;
+    padding: 13px 17px;
+    font-size: 14px;
+    font-weight: 950;
     cursor: pointer;
-    transition: 0.2s ease;
-    background: rgba(255,255,255,0.7);
-    color: #1d2b5c;
+    transition: 0.22s ease;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
   }
 
   .feedback-btn:hover {
-    transform: translateY(-2px);
-    background: rgba(255,255,255,0.95);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  .feedback-btn:active {
+    transform: translateY(0) scale(0.98);
   }
 
   .feedback-btn.like {
-    border-color: rgba(16, 185, 129, 0.28);
+    background: linear-gradient(135deg, #10b981, #059669);
   }
 
   .feedback-btn.dislike {
-    border-color: rgba(239, 68, 68, 0.28);
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .reply-copy-text {
+    margin-bottom: 10px;
+  }
+
+  .copy-reply-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 13px;
+    background: #10b981;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .copy-reply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.18);
   }
 
   .feedback-form {
@@ -433,11 +659,16 @@
     background: rgba(16, 185, 129, 0.2);
   }
 
-  body.night-mode .feedback-btn,
-  body.night-mode .feedback-form textarea {
+  body.night-mode .feedback-form textarea,
+  body.night-mode .agent-name-input {
     background: rgba(15, 23, 42, 0.62);
     color: #dbeafe;
     border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .agent-name-input:focus {
+    background: rgba(15, 23, 42, 0.82);
+    border-color: rgba(147, 197, 253, 0.42);
   }
 
   body.night-mode .export-feedback-btn {
@@ -923,13 +1154,28 @@
 </style>
 </head>
 
+
 <body>
 
+<div class="agent-login-overlay" id="agentLoginOverlay">
+  <div class="agent-login-box">
+    <h2>Secure Agent Login</h2>
+    <p>أدخل اسم الأيجنت قبل الدخول ويمكن تغييره بأي وقت</p>
+    <input type="text" id="agentLoginInput" placeholder="Agent Name" autocomplete="off">
+    <input type="password" id="agentPasswordInput" placeholder="Password" autocomplete="off">
+    <div class="login-error" id="loginError"></div>
+    <button type="button" id="agentLoginBtn">Login</button>
+  </div>
+</div>
+
+
 <button class="theme-toggle" id="themeToggle" type="button">🌙 </button>
+<div class="watermark">Abdulrahman Alsoub</div>
+<div class="agent-name-display" id="agentNameDisplay">Welcome Back</div>
 
 <div class="search-wrapper">
   <div class="search-box">
-    <input type="text" id="knowledgeSearch" placeholder="Search....">
+    <input type="text" id="knowledgeSearch" placeholder="Search">
   </div>
   <div class="no-results" id="noResults">ما في نتائج مطابقة</div>
 </div>
@@ -938,7 +1184,6 @@
   <div class="mini-panel">
     <h3>⭐ Quick Access</h3>
     <div class="mini-list" id="quickAccessList"></div>
-    <button class="export-feedback-btn" id="exportFeedbackBtn" type="button">Export Local Backup</button>
   </div>
 
   <div class="mini-panel">
@@ -1162,10 +1407,16 @@
   const actionButtons = document.querySelectorAll('.action-btn');
   const quickAccessList = document.getElementById('quickAccessList');
   const recentList = document.getElementById('recentList');
-  const exportFeedbackBtn = document.getElementById('exportFeedbackBtn');
+  const agentLoginOverlay = document.getElementById('agentLoginOverlay');
+  const agentLoginInput = document.getElementById('agentLoginInput');
+  const agentPasswordInput = document.getElementById('agentPasswordInput');
+  const loginError = document.getElementById('loginError');
+  const agentLoginBtn = document.getElementById('agentLoginBtn');
+  const agentNameDisplay = document.getElementById('agentNameDisplay');
   let currentCaseButton = null;
-  const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxNSEVdFE1aNzCTVxvElEuIKmsaqneYdnFyl-k1-5gJCUJJdJxkJf4p8Y8nh86cFceqdQ/exec';
-
+  const AGENT_NAME_STORAGE_KEY = 'knowledgeAgentName';
+  const AGENT_LOGIN_URL = 'https://script.google.com/macros/s/AKfycbyJkaoquSUE--EUdy1lKky5080ikdwFe6R68031TiBy_IiAN_AYEy_f69N3VBTCI1QLeg/exec';
+  const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzaBMdbg_mypHDcCSzuw6nGWGt6BAc7-pPa3tq1OBTl9qyCQ_wNwy-HSbD8e5PHNTgl3w/exec';
   const themeToggle = document.getElementById('themeToggle');
 
   function applyTheme(mode) {
@@ -1186,6 +1437,163 @@
     const newTheme = isNight ? 'night' : 'light';
     localStorage.setItem('knowledgeTheme', newTheme);
     applyTheme(newTheme);
+  });
+
+  function getSavedAgentName() {
+    return localStorage.getItem(AGENT_NAME_STORAGE_KEY) || '';
+  }
+
+  function saveAgentName(name) {
+    localStorage.setItem(AGENT_NAME_STORAGE_KEY, name.trim());
+  }
+
+  function typeAgentWelcome(text) {
+    agentNameDisplay.textContent = '';
+    agentNameDisplay.classList.add('typing');
+
+    let index = 0;
+    const typingInterval = setInterval(() => {
+      agentNameDisplay.textContent += text.charAt(index);
+      index += 1;
+
+      if (index >= text.length) {
+        clearInterval(typingInterval);
+        setTimeout(() => {
+          agentNameDisplay.classList.remove('typing');
+        }, 500);
+      }
+    }, 55);
+  }
+
+  function updateAgentDisplay() {
+    const agentName = getSavedAgentName();
+    const welcomeText = agentName ? `Welcome Back, ${agentName}` : 'Welcome Back';
+    typeAgentWelcome(welcomeText);
+  }
+
+  function showAgentLoginIfNeeded() {
+    updateAgentDisplay();
+    agentLoginInput.value = getSavedAgentName();
+    agentPasswordInput.value = '';
+    loginError.classList.remove('show');
+    loginError.textContent = '';
+    agentLoginOverlay.classList.add('show');
+    setTimeout(() => {
+      if (agentLoginInput.value.trim()) {
+        agentPasswordInput.focus();
+      } else {
+        agentLoginInput.focus();
+      }
+    }, 50);
+  }
+
+  function loginWithJsonp(name, password) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `agentLoginCallback_${Date.now()}`;
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Login request timeout'));
+      }, 12000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+        delete window[callbackName];
+      }
+
+      window[callbackName] = (result) => {
+        cleanup();
+        resolve(result);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error('Login script failed'));
+      };
+
+      const loginUrl = `${AGENT_LOGIN_URL}?action=login&agentName=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}&callback=${callbackName}`;
+      console.log('Agent login URL:', loginUrl);
+      script.src = loginUrl;
+      document.body.appendChild(script);
+    });
+  }
+
+  async function completeAgentLogin() {
+    const name = agentLoginInput.value.trim();
+    const password = agentPasswordInput.value.trim();
+
+    loginError.classList.remove('show');
+    loginError.textContent = '';
+
+    if (!name || !password) {
+      loginError.textContent = 'Please enter Agent Name and Password';
+      loginError.classList.add('show');
+      if (!name) {
+        agentLoginInput.focus();
+      } else {
+        agentPasswordInput.focus();
+      }
+      return;
+    }
+
+    agentLoginBtn.disabled = true;
+    agentLoginBtn.textContent = 'Checking...';
+
+    try {
+      const result = await loginWithJsonp(name, password);
+
+      if (!result.success) {
+        loginError.textContent = result.message || JSON.stringify(result) || 'Wrong Agent Name or Password';
+        loginError.classList.add('show');
+        console.log('Agent login result:', result);
+        agentPasswordInput.value = '';
+        agentPasswordInput.focus();
+        return;
+      }
+
+      const verifiedName = result.agentName || name;
+      saveAgentName(verifiedName);
+      updateAgentDisplay();
+      agentLoginInput.value = verifiedName;
+      agentPasswordInput.value = '';
+      agentLoginOverlay.classList.remove('show');
+    } catch (error) {
+      console.error('Agent login failed:', error);
+      loginError.textContent = `${error.message || 'Login Server Error'} - افتح Console وشوف Agent login URL`;
+      loginError.classList.add('show');
+    } finally {
+      agentLoginBtn.disabled = false;
+      agentLoginBtn.textContent = 'Login';
+    }
+  }
+
+  agentLoginBtn.addEventListener('click', completeAgentLogin);
+  agentLoginInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      completeAgentLogin();
+    }
+  });
+
+  agentPasswordInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      completeAgentLogin();
+    }
+  });
+
+  showAgentLoginIfNeeded();
+
+  agentNameDisplay.style.cursor = 'pointer';
+  agentNameDisplay.title = 'Change Name';
+  agentNameDisplay.addEventListener('click', () => {
+    agentLoginInput.value = getSavedAgentName();
+    agentPasswordInput.value = '';
+    loginError.classList.remove('show');
+    loginError.textContent = '';
+    agentLoginOverlay.classList.add('show');
+    setTimeout(() => agentPasswordInput.focus(), 50);
   });
 
   function getSeverityFromButton(button) {
@@ -1494,8 +1902,16 @@
   async function saveCaseFeedback(type, note = '') {
     if (!currentCaseButton) return;
 
+    const agentName = getSavedAgentName();
+    const cleanAgentName = agentName || 'Not provided';
+
     const feedbackItem = {
       date: new Date().toISOString(),
+      agentName: cleanAgentName,
+      agent_name: cleanAgentName,
+      agent: cleanAgentName,
+      AgentName: cleanAgentName,
+      'Agent Name': cleanAgentName,
       caseTitle: currentCaseButton.dataset.title || currentCaseButton.textContent.trim(),
       visibleName: currentCaseButton.textContent.trim(),
       rating: type,
@@ -1515,9 +1931,6 @@
       await fetch(GOOGLE_SHEET_WEB_APP_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'text/plain;charset=utf-8'
-        },
         body: JSON.stringify(feedbackItem)
       });
     } catch (error) {
@@ -1558,43 +1971,6 @@
     });
   }
 
-  function exportFeedbackSheet() {
-    const feedback = JSON.parse(localStorage.getItem('caseFeedback') || '[]');
-
-    if (feedback.length === 0) {
-      alert('No feedback saved yet.');
-      return;
-    }
-
-    const headers = ['Date', 'Case Title', 'Visible Name', 'Rating', 'Feedback', 'Priority', 'Escalation', 'Refund'];
-    const rows = feedback.map((item) => [
-      item.date,
-      item.caseTitle,
-      item.visibleName,
-      item.rating,
-      item.feedback,
-      item.severity,
-      item.escalation,
-      item.refund
-    ]);
-
-    const csvContent = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${String(cell || '').replaceAll('"', '""')}"`).join(','))
-      .join('\n');
-
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `knowledge-feedback-${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  }
-
-  exportFeedbackBtn.addEventListener('click', exportFeedbackSheet);
-
   function buildPopupCards(description, severity = 'Low', escalation = 'No', refund = 'No') {
     const cleanDescription = description.replaceAll('\\n', '\n');
     const lines = cleanDescription
@@ -1617,8 +1993,8 @@
       <div class="info-card">
         <span class="info-card-title">Was this case helpful?</span>
         <div class="feedback-row">
-          <button class="feedback-btn like" id="caseLikeBtn" type="button">👍 Like</button>
-          <button class="feedback-btn dislike" id="caseDislikeBtn" type="button">👎 Dislike</button>
+          <button class="feedback-btn like" id="caseLikeBtn" type="button">✅ Helpful</button>
+          <button class="feedback-btn dislike" id="caseDislikeBtn" type="button">⚠️ Needs Fix</button>
         </div>
         <div class="feedback-form" id="feedbackForm">
           <textarea id="feedbackText" placeholder="اكتب ملاحظتك: شو الغلط أو شو لازم يتعدل؟"></textarea>
@@ -1646,10 +2022,12 @@
           </div>
         `;
       } else if (line.startsWith('رد مقترح:')) {
+        const replyText = line.replace('رد مقترح:', '').trim();
         html += `
           <div class="info-card reply-card">
             <span class="info-card-title">رد مقترح</span>
-            ${line.replace('رد مقترح:', '').trim()}
+            <div class="reply-copy-text">${replyText}</div>
+            <button class="copy-reply-btn" type="button" data-reply="${encodeURIComponent(replyText)}">Copy Reply</button>
           </div>
         `;
       } else if (!line.includes('خطوات التعامل')) {
@@ -1663,6 +2041,30 @@
 
     return html || '<div class="info-card">لا يوجد شرح مضاف لهذا الزر.</div>';
   }
+
+  popupDesc.addEventListener('click', async (event) => {
+    const copyBtn = event.target.closest('.copy-reply-btn');
+    if (!copyBtn) return;
+
+    const replyText = decodeURIComponent(copyBtn.dataset.reply || '');
+    if (!replyText) return;
+
+    try {
+      await navigator.clipboard.writeText(replyText);
+    } catch (error) {
+      const tempInput = document.createElement('textarea');
+      tempInput.value = replyText;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+    }
+
+    copyBtn.textContent = 'Copied';
+    setTimeout(() => {
+      copyBtn.textContent = 'Copy Reply';
+    }, 1200);
+  });
 
   actionButtons.forEach((button) => {
     button.addEventListener('click', () => {
