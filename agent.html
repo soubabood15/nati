@@ -66,6 +66,35 @@
     background: rgba(255,255,255,0.95);
   }
 
+  .online-toggle {
+    position: fixed;
+    top: 18px;
+    left: 96px;
+    z-index: 9998;
+    border: 2px solid rgba(16, 185, 129, 0.22);
+    border-radius: 999px;
+    padding: 11px 16px;
+    background: rgba(255,255,255,0.78);
+    color: #059669;
+    font-size: 14px;
+    font-weight: 950;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.14);
+    backdrop-filter: blur(14px);
+    transition: 0.25s ease;
+  }
+
+  .online-toggle:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,0.95);
+  }
+
+  body.night-mode .online-toggle {
+    background: rgba(15, 23, 42, 0.82);
+    color: #bbf7d0;
+    border-color: rgba(74, 222, 128, 0.32);
+  }
+
   body.night-mode .theme-toggle {
     background: rgba(15, 23, 42, 0.82);
     color: #dbeafe;
@@ -244,13 +273,188 @@
     animation: typingCursor 0.75s infinite;
   }
 
+  .agent-live-panel {
+    position: fixed;
+    top: 68px;
+    left: 96px;
+    right: auto;
+    z-index: 9998;
+    width: 250px;
+    padding: 16px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(238,245,255,0.82));
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    color: #1d2b5c;
+    box-shadow: 0 18px 46px rgba(40,94,255,0.18);
+    backdrop-filter: blur(16px);
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-10px) scale(0.96);
+    transform-origin: top left;
+    transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
+  }
+
+  .agent-live-panel.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+    animation: onlinePanelDrop 0.28s ease;
+  }
+
+  @keyframes onlinePanelDrop {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.94);
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(3px) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .agent-live-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(40, 94, 255, 0.12);
+  }
+
+  .agent-live-title {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .agent-live-title strong {
+    color: #1f4eff;
+    font-size: 14px;
+    font-weight: 950;
+  }
+
+  .agent-live-title small {
+    color: rgba(29, 43, 92, 0.58);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .agent-logout-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 10px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #1d2b5c;
+    font-size: 11px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .agent-logout-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+  }
+
+  .agent-live-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 12px;
+    font-weight: 950;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.62);
+    border: 1px solid rgba(40, 94, 255, 0.10);
+  }
+
+  .agent-live-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #059669;
+  }
+
+  .agent-live-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.12);
+  }
+
+  .agent-live-time {
+    color: #1f4eff;
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .agent-live-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .agent-online-btn,
+  .agent-offline-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .agent-online-btn {
+    background: rgba(16, 185, 129, 0.13);
+    color: #059669;
+  }
+
+  .agent-offline-btn {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+  }
+
+  .agent-online-btn:hover,
+  .agent-offline-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .agent-online-btn:hover {
+    background: rgba(16, 185, 129, 0.22);
+  }
+
+  .agent-offline-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  .agent-online-btn:disabled,
+  .agent-offline-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   @keyframes typingCursor {
     0%, 45% { opacity: 1; }
     46%, 100% { opacity: 0; }
   }
 
-  body.night-mode .agent-login-box,
-  body.night-mode .agent-name-display {
+body.night-mode .agent-login-box,
+body.night-mode .agent-name-display,
+body.night-mode .agent-live-panel {
     background: rgba(15, 23, 42, 0.86);
     color: #dbeafe;
     border-color: rgba(147, 197, 253, 0.22);
@@ -1143,14 +1347,183 @@
       max-height: 240px;
     }
 
-    .theme-toggle {
+    .theme-toggle,
+    .online-toggle {
       position: static;
       display: block;
       margin: 14px auto 0;
       width: calc(100% - 36px);
     }
+
+    .agent-live-panel {
+      top: 126px;
+      left: 18px;
+      right: 18px;
+      width: auto;
+      transform-origin: top center;
+    }
   }
-  
+  .version-status {
+  position: fixed;
+  bottom: 14px;
+  right: 16px;
+  z-index: 9999;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(40, 94, 255, 0.18);
+  color: #1d2b5c;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.version-status.update-found {
+  background: rgba(245, 158, 11, 0.16);
+  color: #b45309;
+}
+
+.version-status.error {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+  .update-required-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(14px);
+  }
+
+  .update-required-overlay.show {
+    display: flex;
+  }
+
+  .update-required-box {
+    width: min(460px, 100%);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    border-radius: 26px;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.34);
+  }
+
+  .update-required-box h2 {
+    margin: 0 0 10px;
+    color: #1f4eff;
+    font-size: 26px;
+    font-weight: 950;
+  }
+
+  .update-required-box p {
+    margin: 0 0 18px;
+    color: rgba(29, 43, 92, 0.72);
+    font-size: 15px;
+    font-weight: 850;
+    line-height: 1.7;
+  }
+
+  .update-version-details {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 18px;
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.13);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .update-refresh-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.22s ease;
+  }
+
+  .update-refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(40, 94, 255, 0.22);
+  }
+
+  body.night-mode .update-required-box {
+    background: rgba(15, 23, 42, 0.96);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .update-required-box h2 {
+    color: #93c5fd;
+  }
+
+  body.night-mode .update-required-box p {
+    color: #dbeafe;
+  }
+
+  .system-closed-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 21000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(15, 23, 42, 0.78);
+    backdrop-filter: blur(14px);
+  }
+
+  .system-closed-overlay.show {
+    display: flex;
+  }
+
+  .system-closed-box {
+    width: min(480px, 100%);
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(239, 68, 68, 0.18);
+    border-radius: 26px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 28px 80px rgba(15, 23, 42, 0.34);
+  }
+
+  .system-closed-box h2 {
+    margin: 0 0 10px;
+    color: #dc2626;
+    font-size: 28px;
+    font-weight: 950;
+  }
+
+  .system-closed-box p {
+    margin: 0;
+    color: rgba(29, 43, 92, 0.74);
+    font-size: 15px;
+    font-weight: 850;
+    line-height: 1.8;
+  }
+
+  body.night-mode .system-closed-box {
+    background: rgba(15, 23, 42, 0.96);
+    border-color: rgba(248, 113, 113, 0.24);
+  }
+
+  body.night-mode .system-closed-box p {
+    color: #dbeafe;
+  }
 </style>
 </head>
 
@@ -1159,8 +1532,8 @@
 
 <div class="agent-login-overlay" id="agentLoginOverlay">
   <div class="agent-login-box">
-    <h2>Welcome back dear</h2>
-    <p>Please fill your information</p>
+    <h2>Secure Agent Login</h2>
+    <p>أدخل اسم الأيجنت قبل الدخول ويمكن تغييره بأي وقت</p>
     <input type="text" id="agentLoginInput" placeholder="Agent Name" autocomplete="off">
     <input type="password" id="agentPasswordInput" placeholder="Password" autocomplete="off">
     <div class="login-error" id="loginError"></div>
@@ -1170,8 +1543,48 @@
 
 
 <button class="theme-toggle" id="themeToggle" type="button">🌙 </button>
+<button class="online-toggle" id="onlineToggle" type="button">🟢 Online</button>
 <div class="watermark">Abdulrahman Alsoub</div>
+<div class="version-status" id="versionStatus">Version: checking...</div>
+
 <div class="agent-name-display" id="agentNameDisplay">Welcome Back</div>
+<div class="agent-live-panel" id="agentLivePanel">
+  <div class="agent-live-header">
+    <div class="agent-live-title">
+      <strong>Agent Status</strong>
+      <small id="agentLiveName">Not logged in</small>
+    </div>
+    <button class="agent-logout-btn" id="agentLogoutBtn" type="button">Logout</button>
+  </div>
+  <div class="agent-live-row">
+    <span class="agent-live-status"><span class="agent-live-dot"></span>Status</span>
+    <span class="agent-live-time" id="agentOnlineTimer">Offline</span>
+  </div>
+  <div class="agent-live-row">
+    <span>Today Total</span>
+    <span class="agent-live-time" id="agentTodayTotalTimer">00:00</span>
+  </div>
+  <div class="agent-live-actions">
+    <button class="agent-online-btn" id="agentOnlineBtn" type="button">Online</button>
+    <button class="agent-offline-btn" id="agentOfflineBtn" type="button">Offline</button>
+  </div>
+</div>
+
+<div class="update-required-overlay" id="updateRequiredOverlay">
+  <div class="update-required-box">
+    <h2>Update Required</h2>
+    <p>يوجد تحديث جديد للنظام. يرجى عمل Refresh قبل المتابعة حتى تظهر لك آخر نسخة.</p>
+    <div class="update-version-details" id="updateVersionDetails">Checking version...</div>
+    <button class="update-refresh-btn" id="updateRefreshBtn" type="button">Refresh Now</button>
+  </div>
+</div>
+
+<div class="system-closed-overlay" id="systemClosedOverlay">
+  <div class="system-closed-box">
+    <h2>System Closed</h2>
+    <p>النظام مغلق مؤقتاً من قبل الأدمن للصيانة أو التحديث. يرجى الانتظار حتى يتم فتح النظام مرة أخرى.</p>
+  </div>
+</div>
 
 <div class="search-wrapper">
   <div class="search-box">
@@ -1398,6 +1811,16 @@
 </div>
 
 <script>
+  const SYSTEM_VERSION = '1.12.4';
+  const SYSTEM_API_URL = 'https://script.google.com/macros/s/AKfycbxex_2mAQYOdF2IIDbPVZ5gCDL9Cghl1owMOLBbT_G920xOATn3-H70nIG-R62huEI7pA/exec';
+  const ATTENDANCE_API_URL = 'https://script.google.com/macros/s/AKfycbwygbva20OrWMkUEP2xBqX5ac2VmntZ15g-vheWtZan8STcZpj7Z-iHh55ewDe-iKII/exec';
+  const ATTENDANCE_INTERVAL = 5 * 1000;
+  const SYSTEM_CHECK_INTERVAL = 5 * 1000;
+  const versionStatus = document.getElementById('versionStatus');
+  const updateRequiredOverlay = document.getElementById('updateRequiredOverlay');
+  const updateVersionDetails = document.getElementById('updateVersionDetails');
+  const updateRefreshBtn = document.getElementById('updateRefreshBtn');
+  const systemClosedOverlay = document.getElementById('systemClosedOverlay');
   const popupOverlay = document.getElementById('popupOverlay');
   const popupTitle = document.getElementById('popupTitle');
   const popupDesc = document.getElementById('popupDesc');
@@ -1413,11 +1836,28 @@
   const loginError = document.getElementById('loginError');
   const agentLoginBtn = document.getElementById('agentLoginBtn');
   const agentNameDisplay = document.getElementById('agentNameDisplay');
+  const agentLivePanel = document.getElementById('agentLivePanel');
+  const agentOnlineTimer = document.getElementById('agentOnlineTimer');
+  const agentTodayTotalTimer = document.getElementById('agentTodayTotalTimer');
+  const agentLiveName = document.getElementById('agentLiveName');
+  const agentOnlineBtn = document.getElementById('agentOnlineBtn');
+  const agentOfflineBtn = document.getElementById('agentOfflineBtn');
+  const agentLogoutBtn = document.getElementById('agentLogoutBtn');
   let currentCaseButton = null;
+  let attendanceTimerId = null;
+  let onlineTimerId = null;
   const AGENT_NAME_STORAGE_KEY = 'knowledgeAgentName';
-  const AGENT_LOGIN_URL = 'https://script.google.com/macros/s/AKfycbyJkaoquSUE--EUdy1lKky5080ikdwFe6R68031TiBy_IiAN_AYEy_f69N3VBTCI1QLeg/exec';
-  const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzaBMdbg_mypHDcCSzuw6nGWGt6BAc7-pPa3tq1OBTl9qyCQ_wNwy-HSbD8e5PHNTgl3w/exec';
+  const ATTENDANCE_SESSION_KEY = 'knowledgeAttendanceSessionId';
+  const ATTENDANCE_LOGIN_TIME_KEY = 'knowledgeAttendanceLoginTime';
+  const ATTENDANCE_STATUS_KEY = 'knowledgeAttendanceStatus';
+  const ATTENDANCE_TOTAL_SECONDS_KEY = 'knowledgeAttendanceTotalSeconds';
+  const ATTENDANCE_LAST_TICK_KEY = 'knowledgeAttendanceLastTick';
+  const REFRESH_KEY_STORAGE_KEY = 'knowledgeRefreshKey';
+  const CLOSED_LOGOUT_DONE_KEY = 'knowledgeClosedLogoutDone';
+  const AGENT_LOGIN_URL = 'https://script.google.com/macros/s/AKfycbzGi3SloTQSfCjU0bdBUQUuZx5Cs4cyQ-b0iUMAl9-U14rXTee-bfwx4ETDW5iN0rNPEA/exec';
+  const GOOGLE_SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbweQEGbF94_94FOHfLMZWv3bB7w-TEdllymGF1QGX7S2RUQzVOUguDZU_MGHCRj0NZ7Wg/exec';
   const themeToggle = document.getElementById('themeToggle');
+  const onlineToggle = document.getElementById('onlineToggle');
 
   function applyTheme(mode) {
     if (mode === 'night') {
@@ -1441,6 +1881,34 @@
 
   function getSavedAgentName() {
     return localStorage.getItem(AGENT_NAME_STORAGE_KEY) || '';
+  }
+
+  function isAgentOnline() {
+    return localStorage.getItem(ATTENDANCE_STATUS_KEY) === 'online';
+  }
+
+  function setAgentOnlineStatus(status) {
+    localStorage.setItem(ATTENDANCE_STATUS_KEY, status);
+  }
+
+  function getTodayKey() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getTodayTotalSecondsKey() {
+    return `${ATTENDANCE_TOTAL_SECONDS_KEY}_${getTodayKey()}`;
+  }
+
+  function getTodayOnlineSeconds() {
+    return Math.max(0, Number(localStorage.getItem(getTodayTotalSecondsKey()) || 0));
+  }
+
+  function setTodayOnlineSeconds(seconds) {
+    localStorage.setItem(getTodayTotalSecondsKey(), String(Math.max(0, Number(seconds || 0))));
   }
 
   function saveAgentName(name) {
@@ -1469,6 +1937,9 @@
     const agentName = getSavedAgentName();
     const welcomeText = agentName ? `Welcome Back, ${agentName}` : 'Welcome Back';
     typeAgentWelcome(welcomeText);
+    if (agentLiveName) {
+      agentLiveName.textContent = agentName || 'Not logged in';
+    }
   }
 
   function showAgentLoginIfNeeded() {
@@ -1477,7 +1948,11 @@
     agentPasswordInput.value = '';
     loginError.classList.remove('show');
     loginError.textContent = '';
-    agentLoginOverlay.classList.add('show');
+    if (!getSavedAgentName() || !isAgentOnline()) {
+      agentLoginOverlay.classList.add('show');
+    } else {
+      agentLoginOverlay.classList.remove('show');
+    }
     setTimeout(() => {
       if (agentLoginInput.value.trim()) {
         agentPasswordInput.focus();
@@ -1485,6 +1960,281 @@
         agentLoginInput.focus();
       }
     }, 50);
+  }
+  function forceLogoutAndReload(nextRefreshKey = '') {
+    try {
+      if (typeof logoutAgent === 'function') {
+        logoutAgent({ showLogin: false });
+      }
+    } catch (error) {
+      console.error('Force logout failed:', error);
+    }
+
+    if (nextRefreshKey) {
+      localStorage.setItem(REFRESH_KEY_STORAGE_KEY, nextRefreshKey);
+    }
+
+    window.location.reload();
+  }
+
+  function checkSystemStatus() {
+    return new Promise((resolve) => {
+      const callbackName = `systemStatusCallback_${Date.now()}`;
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => {
+        cleanup();
+        versionStatus.classList.add('error');
+        versionStatus.textContent = 'System check failed';
+        resolve(false);
+      }, 12000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+        delete window[callbackName];
+      }
+
+      window[callbackName] = (result) => {
+        cleanup();
+
+        if (!result || !result.success) {
+          versionStatus.classList.add('error');
+          versionStatus.textContent = result?.message || 'System check failed';
+          resolve(false);
+          return;
+        }
+
+        const serverRefreshKey = String(result.refreshKey || 'initial');
+        const systemStatus = String(result.systemStatus || 'OPEN');
+        const savedRefreshKey = localStorage.getItem(REFRESH_KEY_STORAGE_KEY) || serverRefreshKey;
+
+        if (!localStorage.getItem(REFRESH_KEY_STORAGE_KEY)) {
+          localStorage.setItem(REFRESH_KEY_STORAGE_KEY, serverRefreshKey);
+        }
+
+        versionStatus.classList.remove('error', 'update-found');
+        versionStatus.textContent = `Status: ${systemStatus} | Key: ${serverRefreshKey}`;
+
+        if (systemStatus === 'CLOSED') {
+          systemClosedOverlay.classList.add('show');
+
+          if (getSavedAgentName() && !localStorage.getItem(CLOSED_LOGOUT_DONE_KEY)) {
+            localStorage.setItem(CLOSED_LOGOUT_DONE_KEY, '1');
+            forceLogoutAndReload(serverRefreshKey);
+            return;
+          }
+        } else {
+          localStorage.removeItem(CLOSED_LOGOUT_DONE_KEY);
+          systemClosedOverlay.classList.remove('show');
+        }
+
+        if (serverRefreshKey !== savedRefreshKey) {
+          versionStatus.classList.add('update-found');
+          versionStatus.textContent = 'Admin requested refresh.';
+          updateVersionDetails.textContent = `Old: ${savedRefreshKey} | New: ${serverRefreshKey}`;
+          forceLogoutAndReload(serverRefreshKey);
+          return;
+        }
+
+        resolve(true);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        versionStatus.classList.add('error');
+        versionStatus.textContent = 'System check failed';
+        resolve(false);
+      };
+
+      script.src = `${SYSTEM_API_URL}?action=getSystem&callback=${callbackName}&t=${Date.now()}`;
+      document.body.appendChild(script);
+    });
+  }
+
+checkSystemStatus();
+setInterval(checkSystemStatus, SYSTEM_CHECK_INTERVAL);
+
+  updateRefreshBtn.addEventListener('click', () => {
+    const detailsText = updateVersionDetails.textContent || '';
+    const newKeyMatch = detailsText.match(/New:\s*(.+)$/);
+    if (newKeyMatch && newKeyMatch[1]) {
+      localStorage.setItem(REFRESH_KEY_STORAGE_KEY, newKeyMatch[1].trim());
+    }
+    window.location.reload(true);
+  });
+  function getAttendanceSessionId() {
+    let sessionId = sessionStorage.getItem(ATTENDANCE_SESSION_KEY);
+
+    if (!sessionId) {
+      sessionId = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+      sessionStorage.setItem(ATTENDANCE_SESSION_KEY, sessionId);
+      sessionStorage.setItem(ATTENDANCE_LOGIN_TIME_KEY, String(Date.now()));
+    }
+
+    return sessionId;
+  }
+
+  function getOnlineSeconds() {
+    return getTodayOnlineSeconds();
+  }
+
+  function tickOnlineSeconds() {
+    if (!isAgentOnline()) return;
+
+    const now = Date.now();
+    const lastTick = Number(localStorage.getItem(ATTENDANCE_LAST_TICK_KEY) || now);
+    const diffSeconds = Math.max(0, Math.floor((now - lastTick) / 1000));
+
+    if (diffSeconds > 0 && diffSeconds < 120) {
+      const currentTotal = getTodayOnlineSeconds();
+      setTodayOnlineSeconds(currentTotal + diffSeconds);
+    }
+
+    localStorage.setItem(ATTENDANCE_LAST_TICK_KEY, String(now));
+  }
+
+  function formatOnlineTimer(totalSeconds) {
+    const seconds = Math.max(0, Number(totalSeconds || 0));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  function updateOnlineTimer() {
+    if (!agentOnlineTimer) return;
+    tickOnlineSeconds();
+
+    const todayTotal = getOnlineSeconds();
+    agentOnlineTimer.textContent = isAgentOnline() ? 'Online' : 'Offline';
+
+    if (agentTodayTotalTimer) {
+      agentTodayTotalTimer.textContent = formatOnlineTimer(todayTotal);
+    }
+  }
+
+  function startOnlineTimer() {
+    agentOnlineBtn.disabled = true;
+    agentOfflineBtn.disabled = false;
+    updateOnlineTimer();
+
+    if (onlineTimerId) {
+      clearInterval(onlineTimerId);
+    }
+
+    onlineTimerId = setInterval(updateOnlineTimer, 1000);
+  }
+
+  function stopOnlineTimer() {
+    if (onlineTimerId) {
+      clearInterval(onlineTimerId);
+      onlineTimerId = null;
+    }
+
+    agentOnlineTimer.textContent = 'Offline';
+    if (agentTodayTotalTimer) {
+      agentTodayTotalTimer.textContent = formatOnlineTimer(getOnlineSeconds());
+    }
+    agentOnlineBtn.disabled = false;
+    agentOfflineBtn.disabled = true;
+  }
+
+  function sendAttendanceHeartbeat(eventType = 'heartbeat') {
+    const agentName = getSavedAgentName();
+    if (!agentName || !isAgentOnline()) return;
+
+    tickOnlineSeconds();
+    if (agentTodayTotalTimer) {
+      agentTodayTotalTimer.textContent = formatOnlineTimer(getOnlineSeconds());
+    }
+
+    const callbackName = `attendanceCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+    const script = document.createElement('script');
+    const sessionId = getAttendanceSessionId();
+    const onlineSeconds = getOnlineSeconds();
+    const timeout = setTimeout(() => {
+      cleanup();
+    }, 12000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      delete window[callbackName];
+    }
+
+    window[callbackName] = () => {
+      cleanup();
+    };
+
+    script.onerror = cleanup;
+    script.src = `${ATTENDANCE_API_URL}?action=${encodeURIComponent(eventType)}&agentName=${encodeURIComponent(agentName)}&sessionId=${encodeURIComponent(sessionId)}&onlineSeconds=${encodeURIComponent(onlineSeconds)}&totalOnlineSeconds=${encodeURIComponent(onlineSeconds)}&onlineDate=${encodeURIComponent(getTodayKey())}&onlineSince=${encodeURIComponent(sessionStorage.getItem(ATTENDANCE_LOGIN_TIME_KEY) || '')}&version=${encodeURIComponent(SYSTEM_VERSION)}&page=${encodeURIComponent('Knowledge Base')}&callback=${callbackName}&t=${Date.now()}`;
+    document.body.appendChild(script);
+  }
+
+  function startAttendanceHeartbeat(isLoginEvent = false) {
+    setAgentOnlineStatus('online');
+    localStorage.setItem(ATTENDANCE_LAST_TICK_KEY, String(Date.now()));
+
+    if (isLoginEvent || !sessionStorage.getItem(ATTENDANCE_SESSION_KEY) || !sessionStorage.getItem(ATTENDANCE_LOGIN_TIME_KEY)) {
+      sessionStorage.setItem(ATTENDANCE_SESSION_KEY, `${Date.now()}-${Math.floor(Math.random() * 1000000)}`);
+      sessionStorage.setItem(ATTENDANCE_LOGIN_TIME_KEY, String(Date.now()));
+      sendAttendanceHeartbeat('login');
+    } else {
+      sendAttendanceHeartbeat('heartbeat');
+    }
+
+    if (attendanceTimerId) {
+      clearInterval(attendanceTimerId);
+    }
+
+    attendanceTimerId = setInterval(() => {
+      sendAttendanceHeartbeat('heartbeat');
+    }, ATTENDANCE_INTERVAL);
+
+    startOnlineTimer();
+  }
+
+  function sendAttendanceOffline() {
+    const agentName = getSavedAgentName();
+    if (!agentName) return;
+
+    tickOnlineSeconds();
+    if (agentTodayTotalTimer) {
+      agentTodayTotalTimer.textContent = formatOnlineTimer(getOnlineSeconds());
+    }
+
+    const callbackName = `attendanceOfflineCallback_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+    const script = document.createElement('script');
+    const sessionId = getAttendanceSessionId();
+    const onlineSeconds = getOnlineSeconds();
+    const timeout = setTimeout(() => {
+      cleanup();
+    }, 8000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      delete window[callbackName];
+    }
+
+    window[callbackName] = () => {
+      cleanup();
+    };
+
+    script.onerror = cleanup;
+    script.src = `${ATTENDANCE_API_URL}?action=offline&agentName=${encodeURIComponent(agentName)}&sessionId=${encodeURIComponent(sessionId)}&onlineSeconds=${encodeURIComponent(onlineSeconds)}&totalOnlineSeconds=${encodeURIComponent(onlineSeconds)}&onlineDate=${encodeURIComponent(getTodayKey())}&onlineSince=${encodeURIComponent(sessionStorage.getItem(ATTENDANCE_LOGIN_TIME_KEY) || '')}&version=${encodeURIComponent(SYSTEM_VERSION)}&page=${encodeURIComponent('Knowledge Base')}&callback=${callbackName}&t=${Date.now()}`;
+    document.body.appendChild(script);
   }
 
   function loginWithJsonp(name, password) {
@@ -1560,6 +2310,8 @@
       agentLoginInput.value = verifiedName;
       agentPasswordInput.value = '';
       agentLoginOverlay.classList.remove('show');
+      setAgentOnlineStatus('online');
+      startAttendanceHeartbeat(true);
     } catch (error) {
       console.error('Agent login failed:', error);
       loginError.textContent = `${error.message || 'Login Server Error'} - افتح Console وشوف Agent login URL`;
@@ -1583,7 +2335,91 @@
     }
   });
 
-  showAgentLoginIfNeeded();
+showAgentLoginIfNeeded();
+
+if (getSavedAgentName() && isAgentOnline()) {
+  startAttendanceHeartbeat(false);
+} else if (getSavedAgentName()) {
+  stopOnlineTimer();
+}
+updateOnlineTimer();
+
+function logoutAgent(options = {}) {
+  const { showLogin = true } = options;
+  tickOnlineSeconds();
+  sendAttendanceOffline();
+  setAgentOnlineStatus('offline');
+
+  if (attendanceTimerId) {
+    clearInterval(attendanceTimerId);
+    attendanceTimerId = null;
+  }
+
+  stopOnlineTimer();
+  sessionStorage.removeItem(ATTENDANCE_SESSION_KEY);
+  sessionStorage.removeItem(ATTENDANCE_LOGIN_TIME_KEY);
+  localStorage.removeItem(ATTENDANCE_LAST_TICK_KEY);
+  localStorage.removeItem(AGENT_NAME_STORAGE_KEY);
+  localStorage.removeItem(ATTENDANCE_STATUS_KEY);
+  localStorage.removeItem(ATTENDANCE_TOTAL_SECONDS_KEY);
+  localStorage.removeItem(getTodayTotalSecondsKey());
+
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith(ATTENDANCE_TOTAL_SECONDS_KEY + '_')) {
+      localStorage.removeItem(key);
+    }
+  });
+  agentLoginInput.value = '';
+  agentPasswordInput.value = '';
+  updateAgentDisplay();
+  updateOnlineTimer();
+
+  if (showLogin) {
+    sessionStorage.clear();
+    agentLivePanel.classList.remove('show');
+    onlineToggle.classList.remove('active');
+    window.location.reload();
+    return;
+  }
+}
+
+agentLogoutBtn.addEventListener('click', logoutAgent);
+
+onlineToggle.addEventListener('click', () => {
+  agentLivePanel.classList.toggle('show');
+  onlineToggle.classList.toggle('active', agentLivePanel.classList.contains('show'));
+});
+
+agentOnlineBtn.addEventListener('click', () => {
+  if (!getSavedAgentName()) {
+    agentLoginOverlay.classList.add('show');
+    setTimeout(() => agentLoginInput.focus(), 50);
+    return;
+  }
+
+  setAgentOnlineStatus('online');
+  localStorage.setItem(ATTENDANCE_LAST_TICK_KEY, String(Date.now()));
+  agentLoginOverlay.classList.remove('show');
+  startAttendanceHeartbeat(false);
+  updateOnlineTimer();
+});
+
+agentOfflineBtn.addEventListener('click', () => {
+  tickOnlineSeconds();
+  sendAttendanceOffline();
+  setAgentOnlineStatus('offline');
+
+  if (attendanceTimerId) {
+    clearInterval(attendanceTimerId);
+    attendanceTimerId = null;
+  }
+
+  stopOnlineTimer();
+  updateOnlineTimer();
+  sessionStorage.removeItem(ATTENDANCE_SESSION_KEY);
+  sessionStorage.removeItem(ATTENDANCE_LOGIN_TIME_KEY);
+  localStorage.removeItem(ATTENDANCE_LAST_TICK_KEY);
+});
 
   agentNameDisplay.style.cursor = 'pointer';
   agentNameDisplay.title = 'Change Name';
