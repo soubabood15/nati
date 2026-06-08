@@ -1,28 +1,1784 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Knowledge Base</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f7fbff, #eef5ff);
+    color: #1d2b5c;
+    padding: 26px;
+  }
+
+  .admin-shell {
+    width: min(1150px, 100%);
+    margin: 0 auto;
+  }
+
+  .admin-header {
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(40, 94, 255, 0.16);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 18px 45px rgba(40, 94, 255, 0.12);
+    backdrop-filter: blur(14px);
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .admin-header h1 {
+    margin: 0;
+    color: #1f4eff;
+    font-size: 30px;
+    font-weight: 950;
+  }
+
+  .admin-header p {
+    margin: 6px 0 0;
+    color: rgba(29, 43, 92, 0.64);
+    font-weight: 800;
+  }
+
+  .admin-badge {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(40, 94, 255, 0.12);
+    color: #1f4eff;
+    font-weight: 950;
+    font-size: 13px;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .theme-toggle {
+    border: 2px solid rgba(40, 94, 255, 0.16);
+    background: rgba(255,255,255,0.68);
+    color: #1d2b5c;
+    border-radius: 999px;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .theme-toggle:hover {
+    transform: translateY(-2px);
+    background: #285eff;
+    color: white;
+    border-color: #285eff;
+  }
+
+  body.night-mode {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: #dbeafe;
+  }
+
+  body.night-mode .admin-header,
+  body.night-mode .panel,
+  body.night-mode .admin-login-card,
+  body.night-mode .table-wrap {
+    background: rgba(15, 23, 42, 0.78);
+    border-color: rgba(147, 197, 253, 0.18);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+  }
+
+  body.night-mode .admin-header h1,
+  body.night-mode .panel-title,
+  body.night-mode .admin-login-card h2 {
+    color: #93c5fd;
+  }
+
+  body.night-mode .admin-header p,
+  body.night-mode .admin-login-card p,
+  body.night-mode .empty,
+  body.night-mode td {
+    color: #dbeafe;
+  }
+
+  body.night-mode .admin-badge,
+  body.night-mode .theme-toggle,
+  body.night-mode .tab-btn,
+  body.night-mode .ghost-btn {
+    background: rgba(15, 23, 42, 0.72);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode .tab-btn.active,
+  body.night-mode .tab-btn:hover,
+  body.night-mode .theme-toggle:hover {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+  }
+
+  body.night-mode input,
+  body.night-mode select {
+    background: rgba(15, 23, 42, 0.72);
+    color: #dbeafe;
+    border-color: rgba(147, 197, 253, 0.22);
+  }
+
+  body.night-mode th {
+    background: rgba(147, 197, 253, 0.12);
+    color: #93c5fd;
+  }
+
+  body.night-mode th,
+  body.night-mode td {
+    border-bottom-color: rgba(147, 197, 253, 0.12);
+  }
+
+  .tabs {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    border: 2px solid rgba(40, 94, 255, 0.16);
+    background: rgba(255,255,255,0.68);
+    color: #1d2b5c;
+    border-radius: 16px;
+    padding: 13px 18px;
+    font-size: 15px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+    box-shadow: 0 8px 20px rgba(40, 94, 255, 0.08);
+  }
+
+  .tab-btn:hover,
+  .tab-btn.active {
+    transform: translateY(-2px);
+    background: #285eff;
+    color: white;
+    border-color: #285eff;
+  }
+
+  .panel {
+    margin-top: 18px;
+    display: none;
+    background: rgba(255,255,255,0.74);
+    border: 1px solid rgba(40, 94, 255, 0.16);
+    border-radius: 24px;
+    padding: 22px;
+    box-shadow: 0 18px 45px rgba(40, 94, 255, 0.10);
+    backdrop-filter: blur(14px);
+  }
+
+  .panel.active {
+    display: block;
+  }
+
+  .panel-title {
+    margin: 0 0 16px;
+    color: #1f4eff;
+    font-size: 22px;
+    font-weight: 950;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .form-grid.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  input, select {
+    width: 100%;
+    border: 2px solid rgba(40, 94, 255, 0.16);
+    border-radius: 14px;
+    padding: 12px 13px;
+    outline: none;
+    color: #1d2b5c;
+    background: rgba(255,255,255,0.78);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  input:focus, select:focus {
+    border-color: rgba(40, 94, 255, 0.48);
+    box-shadow: 0 10px 22px rgba(40, 94, 255, 0.12);
+  }
+
+  .primary-btn,
+  .danger-btn,
+  .ghost-btn {
+    border: none;
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: white;
+    font-size: 14px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+
+  .primary-btn {
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+  }
+
+  .danger-btn {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .ghost-btn {
+    background: rgba(40, 94, 255, 0.12);
+    color: #1f4eff;
+    border: 2px solid rgba(40, 94, 255, 0.16);
+  }
+
+  .primary-btn:hover,
+  .danger-btn:hover,
+  .ghost-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .message {
+    display: none;
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: 900;
+  }
+
+  .message.show {
+    display: block;
+  }
+
+  .message.success {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.22);
+  }
+
+  .message.error {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.22);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 18px;
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    background: rgba(255,255,255,0.54);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+  }
+
+  th, td {
+    padding: 13px 14px;
+    text-align: right;
+    border-bottom: 1px solid rgba(40, 94, 255, 0.10);
+    font-size: 14px;
+  }
+
+  th {
+    background: rgba(40, 94, 255, 0.10);
+    color: #1f4eff;
+    font-weight: 950;
+  }
+
+  td {
+    color: #1d2b5c;
+    font-weight: 750;
+  }
+
+  .row-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .small-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 8px 11px;
+    font-size: 12px;
+    font-weight: 950;
+    cursor: pointer;
+  }
+
+  .edit-btn {
+    background: rgba(40, 94, 255, 0.12);
+    color: #1f4eff;
+  }
+
+  .delete-btn {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .feedback-analytics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .analytics-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 18px;
+    background: rgba(255,255,255,0.76);
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(40, 94, 255, 0.10);
+  }
+
+  .analytics-card::before {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    top: -35px;
+    left: -25px;
+    background: rgba(40, 94, 255, 0.10);
+  }
+
+  .analytics-label {
+    position: relative;
+    display: block;
+    color: rgba(29, 43, 92, 0.62);
+    font-size: 13px;
+    font-weight: 950;
+    margin-bottom: 8px;
+  }
+
+  .analytics-value {
+    position: relative;
+    color: #1f4eff;
+    font-size: 24px;
+    font-weight: 950;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+
+  .analytics-sub {
+    position: relative;
+    margin-top: 6px;
+    color: rgba(29, 43, 92, 0.56);
+    font-size: 12px;
+    font-weight: 850;
+  }
+
+  .feedback-table-wrap table {
+    min-width: 980px;
+  }
+
+  .rating-pill,
+  .severity-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .rating-like {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+  }
+
+  .rating-dislike {
+    background: rgba(239, 68, 68, 0.13);
+    color: #dc2626;
+  }
+
+  .severity-high {
+    background: rgba(239, 68, 68, 0.13);
+    color: #dc2626;
+  }
+
+  .severity-medium {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+  }
+
+  .severity-low {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+  }
+
+  .feedback-note {
+    max-width: 330px;
+    line-height: 1.55;
+    color: rgba(29, 43, 92, 0.78);
+  }
+
+  .case-cell {
+    font-weight: 950;
+    color: #1d2b5c;
+  }
+
+  .agent-cell {
+    font-weight: 950;
+    color: #1f4eff;
+  }
+
+  body.night-mode .analytics-card {
+    background: rgba(15, 23, 42, 0.76);
+    border-color: rgba(147, 197, 253, 0.18);
+  }
+
+  body.night-mode .analytics-card::before {
+    background: rgba(147, 197, 253, 0.10);
+  }
+
+  body.night-mode .analytics-label,
+  body.night-mode .analytics-sub,
+  body.night-mode .feedback-note,
+  body.night-mode .case-cell {
+    color: #dbeafe;
+  }
+
+  body.night-mode .analytics-value,
+  body.night-mode .agent-cell {
+    color: #93c5fd;
+  }
+
+  .toolbar input,
+  .toolbar select {
+    max-width: 240px;
+  }
+
+  .system-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .system-card {
+    border-radius: 22px;
+    padding: 20px;
+    background: rgba(255,255,255,0.76);
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(40, 94, 255, 0.10);
+  }
+
+  .system-card h3 {
+    margin: 0 0 8px;
+    color: #1f4eff;
+    font-size: 20px;
+    font-weight: 950;
+  }
+
+  .system-card p {
+    margin: 0 0 14px;
+    color: rgba(29, 43, 92, 0.66);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.7;
+  }
+
+  .force-refresh-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 950;
+    cursor: pointer;
+    transition: 0.22s ease;
+  }
+
+  .force-refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(245, 158, 11, 0.24);
+  }
+
+  .system-key-box {
+    display: inline-flex;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(40, 94, 255, 0.10);
+    color: #1f4eff;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 92px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 950;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.26);
+  }
+
+  .status-pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.35);
+  }
+
+  .status-online {
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+  }
+
+  .status-away {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+  }
+
+  .status-offline {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+  }
+
+  .attendance-hero {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .attendance-intro {
+    border-radius: 22px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(40, 94, 255, 0.13), rgba(16, 185, 129, 0.10));
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(40, 94, 255, 0.08);
+  }
+
+  .attendance-intro h3 {
+    margin: 0 0 8px;
+    color: #1f4eff;
+    font-size: 20px;
+    font-weight: 950;
+  }
+
+  .attendance-intro p {
+    margin: 0;
+    color: rgba(29, 43, 92, 0.68);
+    line-height: 1.7;
+    font-weight: 850;
+    font-size: 13px;
+  }
+
+  .attendance-live-clock {
+    border-radius: 22px;
+    padding: 20px;
+    background: rgba(255,255,255,0.76);
+    border: 1px solid rgba(40, 94, 255, 0.14);
+    box-shadow: 0 14px 30px rgba(40, 94, 255, 0.08);
+  }
+
+  .attendance-live-clock span {
+    display: block;
+    color: rgba(29, 43, 92, 0.58);
+    font-size: 12px;
+    font-weight: 950;
+    margin-bottom: 7px;
+  }
+
+  .attendance-live-clock strong {
+    display: block;
+    color: #1f4eff;
+    font-size: 26px;
+    font-weight: 950;
+  }
+
+  .attendance-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .attendance-summary .analytics-card {
+    min-height: 122px;
+  }
+
+  .metric-animate {
+    animation: metricPulse 0.35s ease;
+  }
+
+  @keyframes metricPulse {
+    0% {
+      transform: scale(1);
+    }
+    45% {
+      transform: scale(1.08);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  #attendanceTableBody tr {
+    transition: background 0.25s ease, opacity 0.25s ease;
+  }
+
+  .attendance-updating {
+    opacity: 0.78;
+  }
+
+  .attendance-table-wrap table {
+    min-width: 1120px;
+  }
+
+  .attendance-name-block {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .attendance-name-block small {
+    color: rgba(29, 43, 92, 0.52);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .attendance-time-main {
+    font-weight: 950;
+    color: #1f4eff;
+  }
+
+  .attendance-muted {
+    color: rgba(29, 43, 92, 0.60);
+    font-size: 12px;
+    font-weight: 850;
+  }
+
+  .attendance-page-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(40, 94, 255, 0.10);
+    color: #1f4eff;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .online-duration-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(40, 94, 255, 0.14), rgba(16, 185, 129, 0.14));
+    color: #1f4eff;
+    font-size: 13px;
+    font-weight: 950;
+  }
+
+  .attendance-row-online {
+    background: rgba(16, 185, 129, 0.035);
+  }
+
+  .attendance-row-away {
+    background: rgba(245, 158, 11, 0.045);
+  }
+
+  .attendance-row-offline {
+    background: rgba(239, 68, 68, 0.035);
+  }
+
+  body.night-mode .attendance-intro,
+  body.night-mode .attendance-live-clock {
+    background: rgba(15, 23, 42, 0.76);
+    border-color: rgba(147, 197, 253, 0.18);
+  }
+
+  body.night-mode .attendance-intro h3,
+  body.night-mode .attendance-live-clock strong,
+  body.night-mode .attendance-time-main,
+  body.night-mode .attendance-page-pill {
+    color: #93c5fd;
+  }
+
+  body.night-mode .attendance-intro p,
+  body.night-mode .attendance-live-clock span,
+  body.night-mode .attendance-name-block small,
+  body.night-mode .attendance-muted {
+    color: #dbeafe;
+  }
+
+  body.night-mode .attendance-page-pill {
+    background: rgba(147, 197, 253, 0.12);
+  }
+
+  body.night-mode .system-card {
+    background: rgba(15, 23, 42, 0.76);
+    border-color: rgba(147, 197, 253, 0.18);
+  }
+
+  body.night-mode .system-card h3,
+  body.night-mode .system-key-box {
+    color: #93c5fd;
+  }
+
+  body.night-mode .system-card p {
+    color: #dbeafe;
+  }
+
+  body.night-mode .system-key-box {
+    background: rgba(147, 197, 253, 0.12);
+  }
+
+  .empty {
+    padding: 18px;
+    text-align: center;
+    color: rgba(29, 43, 92, 0.56);
+    font-weight: 900;
+  }
+
+  .admin-login {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+
+  .admin-login-card {
+    width: min(420px, 100%);
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.30);
+    text-align: center;
+  }
+
+  .admin-login-card h2 {
+    margin: 0 0 10px;
+    color: #1f4eff;
+    font-size: 26px;
+    font-weight: 950;
+  }
+
+  .admin-login-card p {
+    margin: 0 0 18px;
+    color: rgba(29, 43, 92, 0.65);
+    font-weight: 800;
+  }
+
+  @media (max-width: 800px) {
+    body {
+      padding: 16px;
+    }
+
+    .form-grid,
+    .form-grid.three {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-header h1 {
+      font-size: 24px;
+    }
+
+    .feedback-analytics {
+      grid-template-columns: 1fr;
+    }
+
+    .system-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .attendance-summary,
+    .attendance-hero {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
 </head>
 
 <body>
 
-<h2>تعديل الفيرجن</h2>
+<div class="admin-login" id="adminLogin">
+  <div class="admin-login-card">
+    <h2>Admin Login</h2>
+    <p>أدخل كلمة مرور الأدمن لفتح لوحة التحكم</p>
+    <input type="password" id="adminPassword" placeholder="Admin Password">
+    <button class="primary-btn" id="adminLoginBtn" type="button" style="width:100%; margin-top:12px;">Login</button>
+    <div class="message error" id="adminLoginMessage"></div>
+  </div>
+</div>
 
-<input id="versionInput" placeholder="1.0.1">
-<button onclick="saveVersion()">حفظ</button>
+<div class="admin-shell">
+  <div class="admin-header">
+    <div>
+      <h1>Admin Panel</h1>
+      <p>إدارة كلمات سر الأيجنتات والفيدباك من مكان واحد.</p>
+    </div>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Night</button>
+      <div class="admin-badge">Knowledge Base Admin</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="passwords" type="button">🔑 Passwords</button>
+    <button class="tab-btn" data-tab="feedback" type="button">📋 Feedback</button>
+    <button class="tab-btn" data-tab="attendance" type="button">🟢 Online</button>
+    <button class="tab-btn" data-tab="system" type="button">⚙️ System</button>
+  </div>
+
+  <section class="panel active" id="passwordsPanel">
+    <h2 class="panel-title">Agent Passwords</h2>
+
+    <div class="form-grid">
+      <input type="text" id="agentNameInput" placeholder="Agent Name">
+      <input type="password" id="agentPasswordInput" placeholder="Password">
+      <input type="password" id="adminPassForAgents" placeholder="Admin Password">
+      <button class="primary-btn" id="addAgentBtn" type="button">Add / Update</button>
+    </div>
+
+    <div class="message" id="passwordMessage"></div>
+
+    <div class="toolbar">
+      <input type="text" id="agentSearch" placeholder="Search agent">
+      <button class="ghost-btn" id="refreshAgentsBtn" type="button">Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent Name</th>
+            <th>Password</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="agentsTableBody">
+          <tr><td colspan="3" class="empty">Loading agents...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="feedbackPanel">
+    <h2 class="panel-title">Feedback</h2>
+
+    <div class="feedback-analytics">
+      <div class="analytics-card">
+        <span class="analytics-label">Total Feedback</span>
+        <div class="analytics-value" id="totalFeedbackMetric">0</div>
+        <div class="analytics-sub">All submitted ratings</div>
+      </div>
+      <div class="analytics-card">
+        <span class="analytics-label">Like / Dislike</span>
+        <div class="analytics-value" id="ratingRatioMetric">0 / 0</div>
+        <div class="analytics-sub" id="ratingPercentMetric">0% helpful</div>
+      </div>
+      <div class="analytics-card">
+        <span class="analytics-label">Most Reported Case</span>
+        <div class="analytics-value" id="mostProblemMetric">-</div>
+        <div class="analytics-sub" id="mostProblemCount">No data yet</div>
+      </div>
+      <div class="analytics-card">
+        <span class="analytics-label">Least Reported Case</span>
+        <div class="analytics-value" id="leastProblemMetric">-</div>
+        <div class="analytics-sub" id="leastProblemCount">No data yet</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="feedbackSearch" placeholder="Search agent, case, note">
+      <select id="ratingFilter">
+        <option value="all">All Ratings</option>
+        <option value="Like">Like</option>
+        <option value="Dislike">Dislike</option>
+      </select>
+      <select id="severityFilter">
+        <option value="all">All Severity</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <button class="ghost-btn" id="refreshFeedbackBtn" type="button">Refresh</button>
+    </div>
+
+    <div class="message" id="feedbackMessage"></div>
+
+    <div class="table-wrap feedback-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Agent</th>
+            <th>Case</th>
+            <th>Rating</th>
+            <th>Feedback Note</th>
+            <th>Severity</th>
+            <th>Escalation</th>
+            <th>Refund</th>
+          </tr>
+        </thead>
+        <tbody id="feedbackTableBody">
+          <tr><td colspan="8" class="empty">Loading feedback...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="attendancePanel">
+    <h2 class="panel-title">Online</h2>
+
+    <div class="attendance-hero">
+      <div class="attendance-intro">
+        <h3>Online Agents Monitor</h3>
+        <p>يعرض الأيجنتات اللي ضغطوا Online من صفحة النولج، وكم صار لهم أونلاين. إذا توقف إرسال النولج أكثر من 45 ثانية يتحول الأيجنت Offline تلقائياً.</p>
+      </div>
+      <div class="attendance-live-clock">
+        <span>آخر تحديث للوحة</span>
+        <strong id="attendanceLastRefresh">-</strong>
+      </div>
+    </div>
+
+    <div class="attendance-summary">
+      <div class="analytics-card">
+        <span class="analytics-label">Online</span>
+        <div class="analytics-value" id="onlineAgentsMetric">0</div>
+        <div class="analytics-sub">آخر إشارة أقل من 20 ثانية</div>
+      </div>
+      <div class="analytics-card">
+        <span class="analytics-label">Pending</span>
+        <div class="analytics-value" id="awayAgentsMetric">0</div>
+        <div class="analytics-sub">آخر إشارة من 20 إلى 45 ثانية</div>
+      </div>
+      <div class="analytics-card">
+        <span class="analytics-label">Offline</span>
+        <div class="analytics-value" id="offlineAgentsMetric">0</div>
+        <div class="analytics-sub">بدون إشارة لأكثر من 45 ثانية</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="attendanceSearch" placeholder="Search agent">
+      <button class="ghost-btn" id="refreshAttendanceBtn" type="button">Refresh</button>
+    </div>
+
+    <div class="message" id="attendanceMessage"></div>
+
+    <div class="table-wrap attendance-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Agent</th>
+            <th>Status</th>
+            <th>Online Since</th>
+            <th>Total Online</th>
+            <th>Page</th>
+            <th>Version</th>
+            <th>Last Signal</th>
+            <th>Signal Age</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableBody">
+          <tr><td colspan="8" class="empty">Loading attendance...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel" id="systemPanel">
+    <h2 class="panel-title">System Controls</h2>
+
+    <div class="system-actions">
+      <div class="system-card">
+        <h3>Force Refresh Knowledge</h3>
+        <p>يضغط الأدمن هذا الزر لإجبار صفحة النولج عند كل الأيجنتات على إظهار نافذة تحديث. الأيجنت يضغط Refresh Now حتى يأخذ آخر نسخة.</p>
+        <input type="password" id="systemAdminPassword" placeholder="Admin Password" style="margin-bottom:12px;">
+        <button class="force-refresh-btn" id="forceRefreshBtn" type="button">Force Refresh Now</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+          <button class="primary-btn" id="openSystemBtn" type="button">Open System</button>
+          <button class="danger-btn" id="closeSystemBtn" type="button">Close System</button>
+        </div>
+        <div class="system-key-box" id="currentRefreshKey">Refresh Key: -</div>
+        <div class="system-key-box" id="currentSystemStatus">Status: -</div>
+      </div>
+
+      <div class="system-card">
+        <h3>Coming Next</h3>
+        <p>هنا نقدر لاحقاً نضيف إغلاق النظام مؤقتاً، رسالة لكل الأيجنتات، أو رقم Version رسمي للنظام.</p>
+      </div>
+    </div>
+
+    <div class="message" id="systemMessage"></div>
+  </section>
+</div>
 
 <script>
-// حماية
-if (localStorage.getItem("logged_in") !== "true") {
-  window.location.href = "index.html";
-}
+  const ADMIN_PASSWORD = 'admin123';
 
-function saveVersion() {
-  const v = document.getElementById("versionInput").value;
-  localStorage.setItem("version", v);
-  alert("تم الحفظ");
-}
+  const AGENTS_API_URL = 'https://script.google.com/macros/s/AKfycbzGi3SloTQSfCjU0bdBUQUuZx5Cs4cyQ-b0iUMAl9-U14rXTee-bfwx4ETDW5iN0rNPEA/exec';
+
+  const themeToggle = document.getElementById('themeToggle');
+  const savedAdminTheme = localStorage.getItem('adminTheme') || 'light';
+
+  function applyAdminTheme(theme) {
+    const isNight = theme === 'night';
+    document.body.classList.toggle('night-mode', isNight);
+    themeToggle.textContent = isNight ? '☀️ Light' : '🌙 Night';
+  }
+
+  applyAdminTheme(savedAdminTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const newTheme = document.body.classList.contains('night-mode') ? 'light' : 'night';
+    localStorage.setItem('adminTheme', newTheme);
+    applyAdminTheme(newTheme);
+  });
+  const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbweQEGbF94_94FOHfLMZWv3bB7w-TEdllymGF1QGX7S2RUQzVOUguDZU_MGHCRj0NZ7Wg/exec';
+  const SYSTEM_API_URL = 'https://script.google.com/macros/s/AKfycbxex_2mAQYOdF2IIDbPVZ5gCDL9Cghl1owMOLBbT_G920xOATn3-H70nIG-R62huEI7pA/exec';
+  const ATTENDANCE_API_URL = 'https://script.google.com/macros/s/AKfycbwygbva20OrWMkUEP2xBqX5ac2VmntZ15g-vheWtZan8STcZpj7Z-iHh55ewDe-iKII/exec';
+
+  const adminLogin = document.getElementById('adminLogin');
+  const adminPassword = document.getElementById('adminPassword');
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  const adminLoginMessage = document.getElementById('adminLoginMessage');
+
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const panels = {
+    passwords: document.getElementById('passwordsPanel'),
+    feedback: document.getElementById('feedbackPanel'),
+    attendance: document.getElementById('attendancePanel'),
+    system: document.getElementById('systemPanel')
+  };
+
+  const agentNameInput = document.getElementById('agentNameInput');
+  const agentPasswordInput = document.getElementById('agentPasswordInput');
+  const adminPassForAgents = document.getElementById('adminPassForAgents');
+  const addAgentBtn = document.getElementById('addAgentBtn');
+  const refreshAgentsBtn = document.getElementById('refreshAgentsBtn');
+  const agentSearch = document.getElementById('agentSearch');
+  const agentsTableBody = document.getElementById('agentsTableBody');
+  const passwordMessage = document.getElementById('passwordMessage');
+
+  const feedbackSearch = document.getElementById('feedbackSearch');
+  const ratingFilter = document.getElementById('ratingFilter');
+  const severityFilter = document.getElementById('severityFilter');
+  const totalFeedbackMetric = document.getElementById('totalFeedbackMetric');
+  const ratingRatioMetric = document.getElementById('ratingRatioMetric');
+  const ratingPercentMetric = document.getElementById('ratingPercentMetric');
+  const mostProblemMetric = document.getElementById('mostProblemMetric');
+  const mostProblemCount = document.getElementById('mostProblemCount');
+  const leastProblemMetric = document.getElementById('leastProblemMetric');
+  const leastProblemCount = document.getElementById('leastProblemCount');
+  const refreshFeedbackBtn = document.getElementById('refreshFeedbackBtn');
+  const feedbackTableBody = document.getElementById('feedbackTableBody');
+  const feedbackMessage = document.getElementById('feedbackMessage');
+
+  const systemAdminPassword = document.getElementById('systemAdminPassword');
+  const forceRefreshBtn = document.getElementById('forceRefreshBtn');
+  const currentRefreshKey = document.getElementById('currentRefreshKey');
+  const currentSystemStatus = document.getElementById('currentSystemStatus');
+  const openSystemBtn = document.getElementById('openSystemBtn');
+  const closeSystemBtn = document.getElementById('closeSystemBtn');
+  const systemMessage = document.getElementById('systemMessage');
+
+  const attendanceSearch = document.getElementById('attendanceSearch');
+  const refreshAttendanceBtn = document.getElementById('refreshAttendanceBtn');
+  const attendanceTableBody = document.getElementById('attendanceTableBody');
+  const attendanceMessage = document.getElementById('attendanceMessage');
+  const onlineAgentsMetric = document.getElementById('onlineAgentsMetric');
+  const awayAgentsMetric = document.getElementById('awayAgentsMetric');
+  const offlineAgentsMetric = document.getElementById('offlineAgentsMetric');
+  const attendanceLastRefresh = document.getElementById('attendanceLastRefresh');
+
+  let agentsData = [];
+  let feedbackData = [];
+  let attendanceData = [];
+  let attendanceLoadedOnce = false;
+  let lastAttendanceMetrics = { online: null, away: null, offline: null };
+
+  function showMessage(element, text, type = 'success') {
+    element.textContent = text;
+    element.className = `message show ${type}`;
+  }
+
+  function hideMessage(element) {
+    element.textContent = '';
+    element.className = 'message';
+  }
+
+  function jsonp(url, params = {}) {
+    return new Promise((resolve, reject) => {
+      const callbackName = `adminCallback_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error('Request timeout'));
+      }, 15000);
+
+      function cleanup() {
+        clearTimeout(timeout);
+        if (script.parentNode) script.parentNode.removeChild(script);
+        delete window[callbackName];
+      }
+
+      window[callbackName] = (result) => {
+        cleanup();
+        resolve(result);
+      };
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error('Request failed'));
+      };
+
+      const query = new URLSearchParams({
+        ...params,
+        callback: callbackName
+      });
+
+      script.src = `${url}?${query.toString()}`;
+      document.body.appendChild(script);
+    });
+  }
+
+  adminLoginBtn.addEventListener('click', () => {
+    if (adminPassword.value.trim() !== ADMIN_PASSWORD) {
+      showMessage(adminLoginMessage, 'Wrong admin password', 'error');
+      return;
+    }
+
+    adminLogin.style.display = 'none';
+    loadAgents();
+    loadFeedback();
+    loadAttendance();
+    loadRefreshKey();
+  });
+
+  adminPassword.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') adminLoginBtn.click();
+  });
+
+  tabButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tab = button.dataset.tab;
+
+      tabButtons.forEach((btn) => btn.classList.remove('active'));
+      button.classList.add('active');
+
+      Object.values(panels).forEach((panel) => panel.classList.remove('active'));
+      panels[tab].classList.add('active');
+    });
+  });
+
+  async function loadAgents() {
+    agentsTableBody.innerHTML = '<tr><td colspan="3" class="empty">Loading agents...</td></tr>';
+    hideMessage(passwordMessage);
+
+    try {
+      const result = await jsonp(AGENTS_API_URL, { action: 'listAgents' });
+
+      if (!result.success) {
+        showMessage(passwordMessage, result.message || 'Failed to load agents', 'error');
+        agentsTableBody.innerHTML = '<tr><td colspan="3" class="empty">No agents loaded</td></tr>';
+        return;
+      }
+
+      agentsData = result.agents || [];
+      renderAgents();
+    } catch (error) {
+      showMessage(passwordMessage, error.message || 'Failed to load agents', 'error');
+      agentsTableBody.innerHTML = '<tr><td colspan="3" class="empty">Error loading agents</td></tr>';
+    }
+  }
+
+  function renderAgents() {
+    const query = agentSearch.value.trim().toLowerCase();
+
+    const filtered = agentsData.filter((agent) => {
+      return String(agent.name || '').toLowerCase().includes(query);
+    });
+
+    if (filtered.length === 0) {
+      agentsTableBody.innerHTML = '<tr><td colspan="3" class="empty">No agents found</td></tr>';
+      return;
+    }
+
+    agentsTableBody.innerHTML = filtered.map((agent) => `
+      <tr>
+        <td>${escapeHtml(agent.name || '')}</td>
+        <td>${escapeHtml(agent.password || '')}</td>
+        <td>
+          <div class="row-actions">
+            <button class="small-btn edit-btn" type="button" onclick="editAgent('${encodeURIComponent(agent.name || '')}', '${encodeURIComponent(agent.password || '')}')">Edit</button>
+            <button class="small-btn delete-btn" type="button" onclick="deleteAgent('${encodeURIComponent(agent.name || '')}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  window.editAgent = function(encodedName, encodedPassword) {
+    agentNameInput.value = decodeURIComponent(encodedName);
+    agentPasswordInput.value = decodeURIComponent(encodedPassword);
+    adminPassForAgents.focus();
+  };
+
+  window.deleteAgent = async function(encodedName) {
+    const name = decodeURIComponent(encodedName);
+    const adminPass = adminPassForAgents.value.trim();
+
+    if (!adminPass) {
+      showMessage(passwordMessage, 'Enter Admin Password first', 'error');
+      adminPassForAgents.focus();
+      return;
+    }
+
+    if (!confirm(`Delete agent ${name}?`)) return;
+
+    try {
+      const result = await jsonp(AGENTS_API_URL, {
+        action: 'deleteAgent',
+        adminPassword: adminPass,
+        agentName: name
+      });
+
+      showMessage(passwordMessage, result.message || 'Done', result.success ? 'success' : 'error');
+      if (result.success) loadAgents();
+    } catch (error) {
+      showMessage(passwordMessage, error.message || 'Delete failed', 'error');
+    }
+  };
+
+  addAgentBtn.addEventListener('click', async () => {
+    const name = agentNameInput.value.trim();
+    const password = agentPasswordInput.value.trim();
+    const adminPass = adminPassForAgents.value.trim();
+
+    if (!name || !password || !adminPass) {
+      showMessage(passwordMessage, 'Fill Agent Name, Password, and Admin Password', 'error');
+      return;
+    }
+
+    try {
+      const result = await jsonp(AGENTS_API_URL, {
+        action: 'upsertAgent',
+        adminPassword: adminPass,
+        agentName: name,
+        password
+      });
+
+      showMessage(passwordMessage, result.message || 'Done', result.success ? 'success' : 'error');
+
+      if (result.success) {
+        agentNameInput.value = '';
+        agentPasswordInput.value = '';
+        loadAgents();
+      }
+    } catch (error) {
+      showMessage(passwordMessage, error.message || 'Save failed', 'error');
+    }
+  });
+
+  refreshAgentsBtn.addEventListener('click', loadAgents);
+  agentSearch.addEventListener('input', renderAgents);
+
+  async function loadRefreshKey() {
+    try {
+      const result = await jsonp(SYSTEM_API_URL, { action: 'getSystem' });
+      if (result.success) {
+        currentRefreshKey.textContent = `Refresh Key: ${result.refreshKey || 'initial'}`;
+        currentSystemStatus.textContent = `Status: ${result.systemStatus || 'OPEN'}`;
+      } else {
+        currentRefreshKey.textContent = 'Refresh Key: error';
+        currentSystemStatus.textContent = 'Status: error';
+      }
+    } catch (error) {
+      currentRefreshKey.textContent = 'Refresh Key: error';
+      currentSystemStatus.textContent = 'Status: error';
+    }
+  }
+
+  forceRefreshBtn.addEventListener('click', async () => {
+    const adminPass = systemAdminPassword.value.trim();
+
+    if (!adminPass) {
+      showMessage(systemMessage, 'Enter Admin Password first', 'error');
+      systemAdminPassword.focus();
+      return;
+    }
+
+    forceRefreshBtn.disabled = true;
+    forceRefreshBtn.textContent = 'Sending...';
+    hideMessage(systemMessage);
+
+    try {
+      const result = await jsonp(SYSTEM_API_URL, {
+        action: 'forceRefresh',
+        adminPassword: adminPass
+      });
+
+      showMessage(systemMessage, result.message || 'Done', result.success ? 'success' : 'error');
+
+      if (result.success) {
+        currentRefreshKey.textContent = `Refresh Key: ${result.refreshKey}`;
+        loadRefreshKey();
+      }
+    } catch (error) {
+      showMessage(systemMessage, error.message || 'Force refresh failed', 'error');
+    } finally {
+      forceRefreshBtn.disabled = false;
+      forceRefreshBtn.textContent = 'Force Refresh Now';
+    }
+  });
+
+  async function setSystemStatus(action) {
+    const adminPass = systemAdminPassword.value.trim();
+
+    if (!adminPass) {
+      showMessage(systemMessage, 'Enter Admin Password first', 'error');
+      systemAdminPassword.focus();
+      return;
+    }
+
+    hideMessage(systemMessage);
+
+    try {
+      const result = await jsonp(SYSTEM_API_URL, {
+        action,
+        adminPassword: adminPass
+      });
+
+      showMessage(systemMessage, result.message || 'Done', result.success ? 'success' : 'error');
+
+      if (result.success) {
+        if (action === 'closeSystem') {
+          await jsonp(SYSTEM_API_URL, {
+            action: 'forceRefresh',
+            adminPassword: adminPass
+          });
+        }
+
+        loadRefreshKey();
+      }
+    } catch (error) {
+      showMessage(systemMessage, error.message || 'System request failed', 'error');
+    }
+  }
+
+  openSystemBtn.addEventListener('click', () => setSystemStatus('openSystem'));
+  closeSystemBtn.addEventListener('click', () => setSystemStatus('closeSystem'));
+
+  function parseLastSeen(value) {
+    if (!value) return null;
+
+    if (value instanceof Date && !Number.isNaN(value.getTime())) {
+      return value;
+    }
+
+    const text = String(value).trim();
+
+    const ddmmyyyy = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (ddmmyyyy) {
+      const day = Number(ddmmyyyy[1]);
+      const month = Number(ddmmyyyy[2]) - 1;
+      const year = Number(ddmmyyyy[3]);
+      const hour = Number(ddmmyyyy[4] || 0);
+      const minute = Number(ddmmyyyy[5] || 0);
+      const second = Number(ddmmyyyy[6] || 0);
+      const parsedLocal = new Date(year, month, day, hour, minute, second);
+      if (!Number.isNaN(parsedLocal.getTime())) return parsedLocal;
+    }
+
+    const parsed = new Date(text);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+
+    return null;
+  }
+
+  function formatAgeText(seconds) {
+    const safeSeconds = Math.max(0, Number(seconds || 0));
+
+    if (safeSeconds < 60) {
+      return `منذ ${safeSeconds} ثانية`;
+    }
+
+    const minutes = Math.floor(safeSeconds / 60);
+    const remainingSeconds = safeSeconds % 60;
+
+    if (minutes < 60) {
+      return remainingSeconds ? `منذ ${minutes} دقيقة و ${remainingSeconds} ثانية` : `منذ ${minutes} دقيقة`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    return remainingMinutes ? `منذ ${hours} ساعة و ${remainingMinutes} دقيقة` : `منذ ${hours} ساعة`;
+  }
+
+  function formatClockTime(date = new Date()) {
+    return date.toLocaleTimeString('ar-JO', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function getAttendanceStatus(lastSeenValue, lastEventValue = '') {
+    const lastEvent = String(lastEventValue || '').toLowerCase();
+
+    if (lastEvent === 'offline') {
+      return { label: 'Offline', className: 'status-offline', ageText: 'ضغط Offline' };
+    }
+
+    const lastSeen = parseLastSeen(lastSeenValue);
+    if (!lastSeen) return { label: 'Offline', className: 'status-offline', ageText: '-' };
+
+    const diffSeconds = Math.max(0, Math.floor((Date.now() - lastSeen.getTime()) / 1000));
+
+    if (diffSeconds < 20) {
+      return { label: 'Online', className: 'status-online', ageText: formatAgeText(diffSeconds) };
+    }
+
+    if (diffSeconds < 45) {
+      return { label: 'Away', className: 'status-away', ageText: formatAgeText(diffSeconds) };
+    }
+
+    return { label: 'Offline', className: 'status-offline', ageText: formatAgeText(diffSeconds) };
+  }
+
+  async function loadAttendance(silent = false) {
+    if (!silent && !attendanceLoadedOnce) {
+      attendanceTableBody.innerHTML = '<tr><td colspan="8" class="empty">Loading attendance...</td></tr>';
+    }
+
+    if (silent && attendanceLoadedOnce) {
+      attendanceTableBody.classList.add('attendance-updating');
+    }
+
+    hideMessage(attendanceMessage);
+
+    try {
+      const result = await jsonp(ATTENDANCE_API_URL, { action: 'list' });
+
+      if (!result.success) {
+        showMessage(attendanceMessage, result.message || 'Failed to load attendance', 'error');
+        if (!attendanceLoadedOnce) {
+          attendanceTableBody.innerHTML = '<tr><td colspan="8" class="empty">No attendance loaded</td></tr>';
+        }
+        return;
+      }
+
+      attendanceData = result.agents || [];
+      attendanceLastRefresh.textContent = formatClockTime();
+      attendanceLoadedOnce = true;
+      renderAttendance();
+    } catch (error) {
+      showMessage(attendanceMessage, error.message || 'Failed to load attendance', 'error');
+      if (!attendanceLoadedOnce) {
+        attendanceTableBody.innerHTML = '<tr><td colspan="8" class="empty">Error loading attendance</td></tr>';
+      }
+    } finally {
+      attendanceTableBody.classList.remove('attendance-updating');
+    }
+  }
+  function setMetricValue(element, value, key) {
+    const textValue = String(value);
+
+    if (element.textContent !== textValue) {
+      element.textContent = textValue;
+
+      if (lastAttendanceMetrics[key] !== null) {
+        element.classList.remove('metric-animate');
+        void element.offsetWidth;
+        element.classList.add('metric-animate');
+      }
+    }
+
+    lastAttendanceMetrics[key] = value;
+  }
+
+  function formatOnlineSince(value) {
+    if (!value) return '';
+
+    const numericValue = Number(value);
+    if (!Number.isNaN(numericValue) && numericValue > 1000000000000) {
+      return new Date(numericValue).toLocaleString('ar-JO', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    return String(value);
+  }
+
+  function getAgentLoginTime(agent) {
+    return formatOnlineSince(agent.onlineSince || agent.loginAt || agent.startedAt || agent.firstSeen || agent.loginTime || agent.loginDate || '');
+  }
+
+  function getAgentSessionId(agent) {
+    return agent.sessionId || agent.session || agent.sessionID || '';
+  }
+
+  function getLiveTotalOnlineSeconds(agent) {
+    return Math.max(0, Number(agent.totalOnlineSeconds || agent.onlineSeconds || agent.onlineTime || agent.durationSeconds || 0));
+  }
+
+  function renderAttendance() {
+    const query = attendanceSearch.value.trim().toLowerCase();
+    let online = 0;
+    let away = 0;
+    let offline = 0;
+
+    const filtered = attendanceData.filter((agent) => {
+      return String(agent.agentName || '').toLowerCase().includes(query);
+    });
+
+    attendanceData.forEach((agent) => {
+      const lastEvent = agent.lastEvent || agent.eventType || agent.action || '';
+      const status = getAttendanceStatus(agent.lastSeen, lastEvent);
+      if (status.label === 'Online') online += 1;
+      if (status.label === 'Away') away += 1;
+      if (status.label === 'Offline') offline += 1;
+    });
+
+    setMetricValue(onlineAgentsMetric, online, 'online');
+    setMetricValue(awayAgentsMetric, away, 'away');
+    setMetricValue(offlineAgentsMetric, offline, 'offline');
+
+    if (filtered.length === 0) {
+      attendanceTableBody.innerHTML = '<tr><td colspan="8" class="empty">No agents found</td></tr>';
+      return;
+    }
+
+    attendanceTableBody.innerHTML = filtered.map((agent) => {
+      const lastEvent = agent.lastEvent || agent.eventType || agent.action || '';
+      const status = getAttendanceStatus(agent.lastSeen, lastEvent);
+      const loginTime = getAgentLoginTime(agent);
+      const sessionId = getAgentSessionId(agent);
+      const liveTotalSeconds = getLiveTotalOnlineSeconds(agent);
+      const onlineText = formatOnlineSeconds(liveTotalSeconds);
+      const pageName = agent.page || 'Knowledge Base';
+      const rowClass = status.label === 'Online' ? 'attendance-row-online' : status.label === 'Away' ? 'attendance-row-away' : 'attendance-row-offline';
+
+      return `
+        <tr class="${rowClass}">
+          <td>
+            <div class="attendance-name-block">
+              <span class="agent-cell">${escapeHtml(agent.agentName || '')}</span>
+              <small>${escapeHtml(sessionId ? `Session: ${String(sessionId).slice(0, 12)}` : 'No session id')}</small>
+            </div>
+          </td>
+          <td><span class="status-pill ${status.className}">${status.label}</span></td>
+          <td><span class="attendance-muted">${escapeHtml(loginTime || '-')}</span></td>
+          <td><span class="online-duration-badge">${escapeHtml(onlineText)}</span></td>
+          <td><span class="attendance-page-pill">${escapeHtml(pageName)}</span></td>
+          <td><span class="attendance-muted">${escapeHtml(agent.version || '-')}</span></td>
+          <td><span class="attendance-muted">${escapeHtml(agent.lastSeen || '-')}</span></td>
+          <td><span class="attendance-muted">${escapeHtml(status.ageText)}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  refreshAttendanceBtn.addEventListener('click', () => loadAttendance(false));
+  attendanceSearch.addEventListener('input', renderAttendance);
+  setInterval(() => loadAttendance(true), 5 * 1000);
+  setInterval(() => {
+    if (attendanceLoadedOnce) renderAttendance();
+  }, 1000);
+  function formatOnlineSeconds(value) {
+    const seconds = Number(value || 0);
+
+    if (!seconds || Number.isNaN(seconds) || seconds < 0) {
+      return '00:00';
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (hours > 0) {
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    }
+
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  }
+
+  async function loadFeedback() {
+    feedbackTableBody.innerHTML = '<tr><td colspan="8" class="empty">Loading feedback...</td></tr>';
+    hideMessage(feedbackMessage);
+
+    try {
+      const result = await jsonp(FEEDBACK_API_URL, { action: 'listFeedback' });
+
+      if (!result.success) {
+        showMessage(feedbackMessage, result.message || 'Failed to load feedback', 'error');
+        feedbackTableBody.innerHTML = '<tr><td colspan="8" class="empty">No feedback loaded</td></tr>';
+        return;
+      }
+
+      feedbackData = result.feedback || [];
+      updateFeedbackAnalytics();
+      renderFeedback();
+    } catch (error) {
+      showMessage(feedbackMessage, error.message || 'Failed to load feedback', 'error');
+      feedbackTableBody.innerHTML = '<tr><td colspan="8" class="empty">Error loading feedback</td></tr>';
+    }
+  }
+
+  function updateFeedbackAnalytics() {
+    const total = feedbackData.length;
+    const likes = feedbackData.filter((item) => String(item.rating || '').toLowerCase() === 'like').length;
+    const dislikes = feedbackData.filter((item) => String(item.rating || '').toLowerCase() === 'dislike').length;
+    const helpfulPercent = total ? Math.round((likes / total) * 100) : 0;
+
+    const caseCounts = {};
+    feedbackData.forEach((item) => {
+      const caseName = item.caseTitle || item.visibleName || 'Unknown Case';
+      caseCounts[caseName] = (caseCounts[caseName] || 0) + 1;
+    });
+
+    const sortedCases = Object.entries(caseCounts).sort((a, b) => b[1] - a[1]);
+    const mostCase = sortedCases[0];
+    const leastCase = sortedCases.length ? [...sortedCases].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))[0] : null;
+
+    totalFeedbackMetric.textContent = total;
+    ratingRatioMetric.textContent = `${likes} / ${dislikes}`;
+    ratingPercentMetric.textContent = `${helpfulPercent}% helpful`;
+
+    mostProblemMetric.textContent = mostCase ? mostCase[0] : '-';
+    mostProblemCount.textContent = mostCase ? `${mostCase[1]} feedback entries` : 'No data yet';
+
+    leastProblemMetric.textContent = leastCase ? leastCase[0] : '-';
+    leastProblemCount.textContent = leastCase ? `${leastCase[1]} feedback entries` : 'No data yet';
+  }
+
+  function getRatingClass(rating) {
+    return String(rating || '').toLowerCase() === 'like' ? 'rating-like' : 'rating-dislike';
+  }
+
+  function getSeverityClass(severity) {
+    const value = String(severity || '').toLowerCase();
+    if (value === 'high') return 'severity-high';
+    if (value === 'medium') return 'severity-medium';
+    return 'severity-low';
+  }
+
+
+  function renderFeedback() {
+    const query = feedbackSearch.value.trim().toLowerCase();
+    const rating = ratingFilter.value;
+    const severity = severityFilter.value;
+
+    const filtered = feedbackData.filter((item) => {
+      const searchable = [
+        item.date,
+        item.agentName,
+        item.caseTitle,
+        item.visibleName,
+        item.rating,
+        item.feedback,
+        item.severity,
+        item.escalation,
+        item.refund
+      ].join(' ').toLowerCase();
+
+      const queryMatches = searchable.includes(query);
+      const ratingMatches = rating === 'all' || String(item.rating || '') === rating;
+      const severityMatches = severity === 'all' || String(item.severity || '') === severity;
+
+      return queryMatches && ratingMatches && severityMatches;
+    });
+
+    if (filtered.length === 0) {
+      feedbackTableBody.innerHTML = '<tr><td colspan="8" class="empty">No feedback found</td></tr>';
+      return;
+    }
+
+    feedbackTableBody.innerHTML = filtered.map((item) => {
+      const ratingText = item.rating || '-';
+      const severityText = item.severity || '-';
+
+      return `
+        <tr>
+          <td>${escapeHtml(item.date || '')}</td>
+          <td><span class="agent-cell">${escapeHtml(item.agentName || '')}</span></td>
+          <td><span class="case-cell">${escapeHtml(item.caseTitle || item.visibleName || '')}</span></td>
+          <td><span class="rating-pill ${getRatingClass(ratingText)}">${escapeHtml(ratingText)}</span></td>
+          <td><div class="feedback-note">${escapeHtml(item.feedback || '')}</div></td>
+          <td><span class="severity-pill ${getSeverityClass(severityText)}">${escapeHtml(severityText)}</span></td>
+          <td>${escapeHtml(item.escalation || '')}</td>
+          <td>${escapeHtml(item.refund || '')}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  refreshFeedbackBtn.addEventListener('click', loadFeedback);
+  feedbackSearch.addEventListener('input', renderFeedback);
+  ratingFilter.addEventListener('change', renderFeedback);
+  severityFilter.addEventListener('change', renderFeedback);
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
 </script>
 
 </body>
