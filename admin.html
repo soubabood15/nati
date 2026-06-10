@@ -771,6 +771,192 @@
     background: rgba(147, 197, 253, 0.12);
   }
 
+  .break-alert {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 10000;
+    width: min(560px, calc(100% - 28px));
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+    color: #ffffff;
+    font-weight: 950;
+    box-shadow: 0 18px 45px rgba(40, 94, 255, 0.28);
+    text-align: center;
+  }
+
+  .break-alert.show {
+    display: block;
+    animation: breakAlertPulse 0.32s ease;
+  }
+
+  @keyframes breakAlertPulse {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-14px); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .break-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .break-card-header h3 {
+    margin: 0;
+  }
+
+  .break-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    font-weight: 950;
+  }
+
+  .break-request-list {
+    display: grid;
+    gap: 10px;
+    max-height: 360px;
+    overflow: auto;
+  }
+
+  .break-request-item {
+    border-radius: 18px;
+    padding: 14px;
+    background: rgba(40, 94, 255, 0.08);
+    border: 1px solid rgba(40, 94, 255, 0.14);
+  }
+
+  .break-request-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .break-request-name {
+    color: #1f4eff;
+    font-size: 15px;
+    font-weight: 950;
+  }
+
+  .break-request-type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.14);
+    color: #047857;
+    font-size: 12px;
+    font-weight: 950;
+  }
+
+  .break-request-meta {
+    color: rgba(29, 43, 92, 0.62);
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.6;
+  }
+
+  .break-request-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  body.night-mode .break-request-item {
+    background: rgba(147, 197, 253, 0.10);
+    border-color: rgba(147, 197, 253, 0.16);
+  }
+
+  body.night-mode .break-request-name {
+    color: #93c5fd;
+  }
+
+  body.night-mode .break-request-meta {
+    color: #dbeafe;
+  }
+
+  .agent-details-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 22px;
+    background: rgba(15, 23, 42, 0.58);
+    backdrop-filter: blur(12px);
+    z-index: 9998;
+  }
+
+  .agent-details-modal.show {
+    display: flex;
+  }
+
+  .agent-details-card {
+    width: min(980px, 100%);
+    max-height: 88vh;
+    overflow: auto;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(40, 94, 255, 0.18);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.30);
+    padding: 22px;
+  }
+
+  .agent-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .agent-details-header h3 {
+    margin: 0;
+    color: #1f4eff;
+    font-size: 24px;
+    font-weight: 950;
+  }
+
+  .agent-details-header p {
+    margin: 6px 0 0;
+    color: rgba(29, 43, 92, 0.62);
+    font-size: 13px;
+    font-weight: 850;
+  }
+
+  .agent-details-close {
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 950;
+  }
+
+  .attendance-clickable-row {
+    cursor: pointer;
+  }
+
+  .attendance-clickable-row:hover {
+    background: rgba(40, 94, 255, 0.08) !important;
+  }
   .empty {
     padding: 18px;
     text-align: center;
@@ -844,6 +1030,8 @@
 </head>
 
 <body>
+
+<div class="break-alert" id="breakAlert">New break request</div>
 
 <div class="admin-login" id="adminLogin">
   <div class="admin-login-card">
@@ -1050,13 +1238,53 @@
       </div>
 
       <div class="system-card">
-        <h3>Coming Next</h3>
-        <p>هنا نقدر لاحقاً نضيف إغلاق النظام مؤقتاً، رسالة لكل الأيجنتات، أو رقم Version رسمي للنظام.</p>
+        <div class="break-card-header">
+          <h3>Break Requests</h3>
+          <span class="break-count-badge" id="pendingBreakCount">0</span>
+        </div>
+        <p>هنا تظهر طلبات Break و Meal من الأيجنتات. اضغط Approve أو Reject ويرجع الرد للأيجنت كتنبيه.</p>
+        <div class="break-request-list" id="breakRequestList">
+          <div class="empty">No break requests yet</div>
+        </div>
       </div>
     </div>
 
     <div class="message" id="systemMessage"></div>
   </section>
+</div>
+
+<div class="agent-details-modal" id="agentDetailsModal">
+  <div class="agent-details-card">
+    <div class="agent-details-header">
+      <div>
+        <h3 id="agentDetailsTitle">Agent Details</h3>
+        <p id="agentDetailsSubtitle">Session history from Attendance sheet</p>
+      </div>
+      <button class="agent-details-close" id="agentDetailsClose" type="button">×</button>
+    </div>
+
+    <div class="table-wrap attendance-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Session ID</th>
+            <th>Online Time</th>
+            <th>Offline Time</th>
+            <th>Duration</th>
+            <th>Seconds</th>
+            <th>Status</th>
+            <th>Page</th>
+            <th>Version</th>
+            <th>Last Update</th>
+          </tr>
+        </thead>
+        <tbody id="agentDetailsTableBody">
+          <tr><td colspan="10" class="empty">No details</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1081,8 +1309,8 @@
     applyAdminTheme(newTheme);
   });
   const FEEDBACK_API_URL = 'https://script.google.com/macros/s/AKfycbweQEGbF94_94FOHfLMZWv3bB7w-TEdllymGF1QGX7S2RUQzVOUguDZU_MGHCRj0NZ7Wg/exec';
-  const SYSTEM_API_URL = 'https://script.google.com/macros/s/AKfycbxex_2mAQYOdF2IIDbPVZ5gCDL9Cghl1owMOLBbT_G920xOATn3-H70nIG-R62huEI7pA/exec';
-  const ATTENDANCE_API_URL = 'https://script.google.com/macros/s/AKfycbwygbva20OrWMkUEP2xBqX5ac2VmntZ15g-vheWtZan8STcZpj7Z-iHh55ewDe-iKII/exec';
+  const SYSTEM_API_URL = 'https://script.google.com/macros/s/AKfycbzexHG-bjSdMaQIwyU0dHnSmKkwaHW_BTW5BWnSml4Ir5AAqRmd7jOrLRXgfZ-42zH4/exec';
+  const ATTENDANCE_API_URL = 'https://script.google.com/macros/s/AKfycbz6stSSUXqhwnL8Fhcb2tN1vepIqnk9Zl3I5qodPc6fYILwwJ1I4-QbGySwVKZBOpLN/exec';
 
   const adminLogin = document.getElementById('adminLogin');
   const adminPassword = document.getElementById('adminPassword');
@@ -1127,6 +1355,9 @@
   const openSystemBtn = document.getElementById('openSystemBtn');
   const closeSystemBtn = document.getElementById('closeSystemBtn');
   const systemMessage = document.getElementById('systemMessage');
+  const breakAlert = document.getElementById('breakAlert');
+  const pendingBreakCount = document.getElementById('pendingBreakCount');
+  const breakRequestList = document.getElementById('breakRequestList');
 
   const attendanceSearch = document.getElementById('attendanceSearch');
   const refreshAttendanceBtn = document.getElementById('refreshAttendanceBtn');
@@ -1136,12 +1367,20 @@
   const awayAgentsMetric = document.getElementById('awayAgentsMetric');
   const offlineAgentsMetric = document.getElementById('offlineAgentsMetric');
   const attendanceLastRefresh = document.getElementById('attendanceLastRefresh');
+  const agentDetailsModal = document.getElementById('agentDetailsModal');
+  const agentDetailsClose = document.getElementById('agentDetailsClose');
+  const agentDetailsTitle = document.getElementById('agentDetailsTitle');
+  const agentDetailsSubtitle = document.getElementById('agentDetailsSubtitle');
+  const agentDetailsTableBody = document.getElementById('agentDetailsTableBody');
 
   let agentsData = [];
   let feedbackData = [];
   let attendanceData = [];
   let attendanceLoadedOnce = false;
   let lastAttendanceMetrics = { online: null, away: null, offline: null };
+  let breakRequestsData = [];
+  let knownPendingBreakIds = new Set();
+  let breakRequestsLoadedOnce = false;
 
   function showMessage(element, text, type = 'success') {
     element.textContent = text;
@@ -1199,6 +1438,7 @@
     loadFeedback();
     loadAttendance();
     loadRefreshKey();
+    loadBreakRequests();
   });
 
   adminPassword.addEventListener('keydown', (event) => {
@@ -1331,7 +1571,7 @@
 
   async function loadRefreshKey() {
     try {
-      const result = await jsonp(SYSTEM_API_URL, { action: 'getSystem' });
+      const result = await jsonp(SYSTEM_API_URL, { action: 'getStatus' });
       if (result.success) {
         currentRefreshKey.textContent = `Refresh Key: ${result.refreshKey || 'initial'}`;
         currentSystemStatus.textContent = `Status: ${result.systemStatus || 'OPEN'}`;
@@ -1360,7 +1600,7 @@
 
     try {
       const result = await jsonp(SYSTEM_API_URL, {
-        action: 'forceRefresh',
+        action: 'refreshAll',
         adminPassword: adminPass
       });
 
@@ -1400,7 +1640,7 @@
       if (result.success) {
         if (action === 'closeSystem') {
           await jsonp(SYSTEM_API_URL, {
-            action: 'forceRefresh',
+            action: 'refreshAll',
             adminPassword: adminPass
           });
         }
@@ -1415,6 +1655,93 @@
   openSystemBtn.addEventListener('click', () => setSystemStatus('openSystem'));
   closeSystemBtn.addEventListener('click', () => setSystemStatus('closeSystem'));
 
+  function showBreakAlert(text) {
+    breakAlert.textContent = text;
+    breakAlert.classList.add('show');
+
+    setTimeout(() => {
+      breakAlert.classList.remove('show');
+    }, 4200);
+  }
+
+  async function loadBreakRequests(silent = false) {
+    try {
+      const result = await jsonp(SYSTEM_API_URL, { action: 'listBreakRequests' });
+
+      if (!result.success) {
+        if (!silent) showMessage(systemMessage, result.message || 'Failed to load break requests', 'error');
+        return;
+      }
+
+      const requests = result.requests || [];
+      const pendingRequests = requests.filter((item) => String(item.status || '').toLowerCase() === 'pending');
+      const currentPendingIds = new Set(pendingRequests.map((item) => String(item.id || '')));
+
+      if (breakRequestsLoadedOnce) {
+        pendingRequests.forEach((item) => {
+          const id = String(item.id || '');
+          if (id && !knownPendingBreakIds.has(id)) {
+            showBreakAlert(`${item.agentName || 'Agent'} requested ${item.breakType || 'Break'}`);
+          }
+        });
+      }
+
+      knownPendingBreakIds = currentPendingIds;
+      breakRequestsLoadedOnce = true;
+      breakRequestsData = requests;
+      renderBreakRequests();
+    } catch (error) {
+      if (!silent) showMessage(systemMessage, error.message || 'Failed to load break requests', 'error');
+    }
+  }
+
+  function renderBreakRequests() {
+    const pendingRequests = breakRequestsData.filter((item) => String(item.status || '').toLowerCase() === 'pending');
+    pendingBreakCount.textContent = String(pendingRequests.length);
+
+    if (pendingRequests.length === 0) {
+      breakRequestList.innerHTML = '<div class="empty">No break requests yet</div>';
+      return;
+    }
+
+    breakRequestList.innerHTML = pendingRequests.map((item) => `
+      <div class="break-request-item">
+        <div class="break-request-top">
+          <div>
+            <div class="break-request-name">${escapeHtml(item.agentName || '')}</div>
+            <div class="break-request-meta">Requested at: ${escapeHtml(item.requestTime || item.date || '')}</div>
+          </div>
+          <span class="break-request-type">${escapeHtml(item.breakType || 'Break')}</span>
+        </div>
+        <div class="break-request-meta">Request ID: ${escapeHtml(item.id || '')}</div>
+        <div class="break-request-actions">
+          <button class="primary-btn" type="button" onclick="updateBreakRequest('${encodeURIComponent(item.id || '')}', 'Approved')">Approve</button>
+          <button class="danger-btn" type="button" onclick="updateBreakRequest('${encodeURIComponent(item.id || '')}', 'Rejected')">Reject</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  window.updateBreakRequest = async function(encodedId, decision) {
+    const id = decodeURIComponent(encodedId);
+
+    if (!id) return;
+
+    try {
+      const result = await jsonp(SYSTEM_API_URL, {
+        action: 'updateBreakRequest',
+        id,
+        decision,
+        adminName: 'Admin'
+      });
+
+      showMessage(systemMessage, result.message || 'Break request updated', result.success ? 'success' : 'error');
+      loadBreakRequests(true);
+    } catch (error) {
+      showMessage(systemMessage, error.message || 'Failed to update break request', 'error');
+    }
+  };
+
   function parseLastSeen(value) {
     if (!value) return null;
 
@@ -1424,14 +1751,19 @@
 
     const text = String(value).trim();
 
-    const ddmmyyyy = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+    const ddmmyyyy = text.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM|ص|م)?)?$/i);
     if (ddmmyyyy) {
       const day = Number(ddmmyyyy[1]);
       const month = Number(ddmmyyyy[2]) - 1;
       const year = Number(ddmmyyyy[3]);
-      const hour = Number(ddmmyyyy[4] || 0);
+      let hour = Number(ddmmyyyy[4] || 0);
       const minute = Number(ddmmyyyy[5] || 0);
       const second = Number(ddmmyyyy[6] || 0);
+      const marker = String(ddmmyyyy[7] || '').toUpperCase();
+
+      if ((marker === 'PM' || marker === 'م') && hour < 12) hour += 12;
+      if ((marker === 'AM' || marker === 'ص') && hour === 12) hour = 0;
+
       const parsedLocal = new Date(year, month, day, hour, minute, second);
       if (!Number.isNaN(parsedLocal.getTime())) return parsedLocal;
     }
@@ -1470,27 +1802,51 @@
     });
   }
 
-  function getAttendanceStatus(lastSeenValue, lastEventValue = '') {
-    const lastEvent = String(lastEventValue || '').toLowerCase();
+  function getAttendanceStatusFromRow(agent) {
+    const statusText = String(agent.status || agent.Status || agent.currentStatus || '').trim().toLowerCase();
+    const offlineTime = String(agent.offlineTime || agent['Offline Time'] || '').trim();
 
-    if (lastEvent === 'offline') {
-      return { label: 'Offline', className: 'status-offline', ageText: 'ضغط Offline' };
+    if (statusText.includes('online') && !offlineTime) {
+      return { label: 'Online', className: 'status-online', ageText: 'Active session' };
     }
 
-    const lastSeen = parseLastSeen(lastSeenValue);
-    if (!lastSeen) return { label: 'Offline', className: 'status-offline', ageText: '-' };
-
-    const diffSeconds = Math.max(0, Math.floor((Date.now() - lastSeen.getTime()) / 1000));
-
-    if (diffSeconds < 20) {
-      return { label: 'Online', className: 'status-online', ageText: formatAgeText(diffSeconds) };
+    if (statusText.includes('offline') || offlineTime) {
+      return { label: 'Offline', className: 'status-offline', ageText: 'Session ended' };
     }
 
-    if (diffSeconds < 45) {
-      return { label: 'Away', className: 'status-away', ageText: formatAgeText(diffSeconds) };
+    return { label: 'Offline', className: 'status-offline', ageText: 'No status from sheet' };
+  }
+
+  function normalizeAttendanceRow(row) {
+    if (Array.isArray(row)) {
+      return {
+        date: row[0] || '',
+        agentName: row[1] || '',
+        sessionId: row[2] || '',
+        onlineTime: row[3] || '',
+        offlineTime: row[4] || '',
+        duration: row[5] || '',
+        onlineSeconds: row[6] || '',
+        status: row[7] || '',
+        page: row[8] || '',
+        version: row[9] || '',
+        lastUpdate: row[10] || ''
+      };
     }
 
-    return { label: 'Offline', className: 'status-offline', ageText: formatAgeText(diffSeconds) };
+    return {
+      date: row.date || row.Date || '',
+      agentName: row.agentName || row['Agent Name'] || row.name || '',
+      sessionId: row.sessionId || row['Session ID'] || row.session || '',
+      onlineTime: row.onlineTime || row['Online Time'] || row.onlineSince || row.lastSeen || '',
+      offlineTime: row.offlineTime || row['Offline Time'] || '',
+      duration: row.duration || row.Duration || '',
+      onlineSeconds: row.onlineSeconds || row['Online Seconds'] || row.totalOnlineSeconds || '',
+      status: row.status || row.Status || row.currentStatus || '',
+      page: row.page || row.Page || '',
+      version: row.version || row.Version || '',
+      lastUpdate: row.lastUpdate || row['Last Update'] || row.lastSeen || ''
+    };
   }
 
   async function loadAttendance(silent = false) {
@@ -1515,7 +1871,8 @@
         return;
       }
 
-      attendanceData = result.agents || [];
+      const rawAttendanceRows = result.agents || result.rows || result.data || result.records || result.attendance || [];
+      attendanceData = rawAttendanceRows.map(normalizeAttendanceRow).filter((row) => String(row.agentName || '').trim());
       attendanceLastRefresh.textContent = formatClockTime();
       attendanceLoadedOnce = true;
       renderAttendance();
@@ -1574,19 +1931,96 @@
     return Math.max(0, Number(agent.totalOnlineSeconds || agent.onlineSeconds || agent.onlineTime || agent.durationSeconds || 0));
   }
 
+  function getLatestAttendanceRowsByAgent() {
+    const grouped = new Map();
+
+    attendanceData.forEach((row, index) => {
+      const agentName = String(row.agentName || '').trim();
+      if (!agentName) return;
+
+      const current = grouped.get(agentName);
+      const rowStatus = getAttendanceStatusFromRow(row).label;
+      const currentStatus = current ? getAttendanceStatusFromRow(current).label : '';
+      const rowTime = parseLastSeen(row.lastUpdate || row.offlineTime || row.onlineTime || row.date);
+      const currentTime = current ? parseLastSeen(current.lastUpdate || current.offlineTime || current.onlineTime || current.date) : null;
+
+      if (!current) {
+        grouped.set(agentName, { ...row, __index: index });
+        return;
+      }
+
+      if (rowStatus === 'Online' && currentStatus !== 'Online') {
+        grouped.set(agentName, { ...row, __index: index });
+        return;
+      }
+
+      if (rowStatus !== 'Online' && currentStatus === 'Online') {
+        return;
+      }
+
+      if ((rowTime && currentTime && rowTime > currentTime) || (!currentTime && rowTime) || (!rowTime && !currentTime && index > (current.__index || -1))) {
+        grouped.set(agentName, { ...row, __index: index });
+      }
+    });
+
+    return Array.from(grouped.values());
+  }
+
+  function getAgentSessions(agentName) {
+    return attendanceData
+      .filter((row) => String(row.agentName || '').trim().toLowerCase() === String(agentName || '').trim().toLowerCase())
+      .sort((a, b) => {
+        const aTime = parseLastSeen(a.lastUpdate || a.offlineTime || a.onlineTime || a.date);
+        const bTime = parseLastSeen(b.lastUpdate || b.offlineTime || b.onlineTime || b.date);
+        return (bTime ? bTime.getTime() : 0) - (aTime ? aTime.getTime() : 0);
+      });
+  }
+
+  window.openAgentDetails = function(agentName) {
+    const sessions = getAgentSessions(agentName);
+
+    agentDetailsTitle.textContent = agentName || 'Agent Details';
+    agentDetailsSubtitle.textContent = `Showing ${sessions.length} session(s) from Attendance sheet`;
+
+    if (sessions.length === 0) {
+      agentDetailsTableBody.innerHTML = '<tr><td colspan="10" class="empty">No details</td></tr>';
+    } else {
+      agentDetailsTableBody.innerHTML = sessions.map((item) => {
+        const status = getAttendanceStatusFromRow(item);
+        return `
+          <tr>
+            <td>${escapeHtml(item.date || '')}</td>
+            <td>${escapeHtml(item.sessionId || '')}</td>
+            <td>${escapeHtml(item.onlineTime || '')}</td>
+            <td>${escapeHtml(item.offlineTime || '')}</td>
+            <td>${escapeHtml(item.duration || formatOnlineSeconds(item.onlineSeconds || 0))}</td>
+            <td>${escapeHtml(item.onlineSeconds || '')}</td>
+            <td><span class="status-pill ${status.className}">${status.label}</span></td>
+            <td>${escapeHtml(item.page || '')}</td>
+            <td>${escapeHtml(item.version || '')}</td>
+            <td>${escapeHtml(item.lastUpdate || '')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    agentDetailsModal.classList.add('show');
+  };
+
   function renderAttendance() {
     const query = attendanceSearch.value.trim().toLowerCase();
     let online = 0;
     let away = 0;
     let offline = 0;
 
-    const filtered = attendanceData.filter((agent) => {
+    const latestRows = getLatestAttendanceRowsByAgent();
+
+    const filtered = latestRows.filter((agent) => {
       return String(agent.agentName || '').toLowerCase().includes(query);
     });
 
-    attendanceData.forEach((agent) => {
-      const lastEvent = agent.lastEvent || agent.eventType || agent.action || '';
-      const status = getAttendanceStatus(agent.lastSeen, lastEvent);
+    latestRows.forEach((agent) => {
+      const status = getAttendanceStatusFromRow(agent);
       if (status.label === 'Online') online += 1;
       if (status.label === 'Away') away += 1;
       if (status.label === 'Offline') offline += 1;
@@ -1602,17 +2036,16 @@
     }
 
     attendanceTableBody.innerHTML = filtered.map((agent) => {
-      const lastEvent = agent.lastEvent || agent.eventType || agent.action || '';
-      const status = getAttendanceStatus(agent.lastSeen, lastEvent);
-      const loginTime = getAgentLoginTime(agent);
+      const status = getAttendanceStatusFromRow(agent);
+      const loginTime = agent.onlineTime || getAgentLoginTime(agent);
       const sessionId = getAgentSessionId(agent);
       const liveTotalSeconds = getLiveTotalOnlineSeconds(agent);
-      const onlineText = formatOnlineSeconds(liveTotalSeconds);
+      const onlineText = agent.duration || formatOnlineSeconds(liveTotalSeconds);
       const pageName = agent.page || 'Knowledge Base';
       const rowClass = status.label === 'Online' ? 'attendance-row-online' : status.label === 'Away' ? 'attendance-row-away' : 'attendance-row-offline';
 
       return `
-        <tr class="${rowClass}">
+        <tr class="${rowClass} attendance-clickable-row" onclick="openAgentDetails(decodeURIComponent('${encodeURIComponent(agent.agentName || '')}'))">
           <td>
             <div class="attendance-name-block">
               <span class="agent-cell">${escapeHtml(agent.agentName || '')}</span>
@@ -1624,7 +2057,7 @@
           <td><span class="online-duration-badge">${escapeHtml(onlineText)}</span></td>
           <td><span class="attendance-page-pill">${escapeHtml(pageName)}</span></td>
           <td><span class="attendance-muted">${escapeHtml(agent.version || '-')}</span></td>
-          <td><span class="attendance-muted">${escapeHtml(agent.lastSeen || '-')}</span></td>
+          <td><span class="attendance-muted">${escapeHtml(agent.lastUpdate || agent.offlineTime || agent.onlineTime || '-')}</span></td>
           <td><span class="attendance-muted">${escapeHtml(status.ageText)}</span></td>
         </tr>
       `;
@@ -1633,7 +2066,17 @@
 
   refreshAttendanceBtn.addEventListener('click', () => loadAttendance(false));
   attendanceSearch.addEventListener('input', renderAttendance);
+  agentDetailsClose.addEventListener('click', () => {
+    agentDetailsModal.classList.remove('show');
+  });
+
+  agentDetailsModal.addEventListener('click', (event) => {
+    if (event.target === agentDetailsModal) {
+      agentDetailsModal.classList.remove('show');
+    }
+  });
   setInterval(() => loadAttendance(true), 5 * 1000);
+  setInterval(() => loadBreakRequests(true), 5 * 1000);
   setInterval(() => {
     if (attendanceLoadedOnce) renderAttendance();
   }, 1000);
