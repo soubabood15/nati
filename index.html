@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Customer Service Knowledge Base</title>
+
+<link rel="stylesheet" href="style.css">
+<style>
+  .break-toggle {
+    position: fixed;
+    top: 18px;
+    left: 265px;
+    z-index: 900;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
+    font-weight: 950;
+    cursor: pointer;
+    box-shadow: 0 14px 32px rgba(245, 158, 11, 0.26);
+  }
+
+  .break-request-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.60);
+    backdrop-filter: blur(12px);
+    z-index: 9999;
+  }
+
+  .break-request-overlay.show {
+    display: flex;
+    animation: breakFadeIn 0.18s ease forwards;
+  }
+
+  .break-request-box {
+    width: min(420px, 100%);
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.32);
+    padding: 22px;
+    text-align: center;
+  }
+
+  .break-request-box h2 {
+    margin: 0 0 8px;
+    color: #b45309;
+    font-size: 26px;
+    font-weight: 950;
+  }
+
+  .break-request-box p {
+    margin: 0 0 18px;
+    color: rgba(29, 43, 92, 0.70);
+    font-weight: 800;
+    line-height: 1.7;
+  }
+
+  .break-request-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .break-request-option {
+    border: none;
+    border-radius: 20px;
+    padding: 18px 12px;
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 950;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+  }
+
+  .break-request-option.break {
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+  }
+
+  .break-request-option.meal {
+    background: linear-gradient(135deg, #10b981, #047857);
+  }
+
+  .break-request-close {
+    margin-top: 14px;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: rgba(15, 23, 42, 0.08);
+    color: #1e293b;
+    font-weight: 950;
+    cursor: pointer;
+  }
+
+  .break-toast {
+    position: fixed;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    width: min(560px, calc(100% - 28px));
+    z-index: 10000;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #285eff, #1d4ed8);
+    color: #ffffff;
+    font-weight: 950;
+    text-align: center;
+    box-shadow: 0 18px 45px rgba(40, 94, 255, 0.28);
+  }
+
+  .break-toast.show {
+    display: block;
+    animation: breakToastIn 0.25s ease forwards;
+  }
+
+  .break-toast.success {
+    background: linear-gradient(135deg, #10b981, #047857);
+  }
+
+  .break-toast.error {
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+  }
+
+  @keyframes breakFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes breakToastIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  body.dark .break-request-box,
+  body.night-mode .break-request-box {
+    background: rgba(15, 23, 42, 0.96);
+  }
+
+  body.dark .break-request-box p,
+  body.night-mode .break-request-box p {
+    color: #dbeafe;
+  }
+</style>
+
+</head>
+
+<body>
+
+<div class="agent-login-overlay" id="agentLoginOverlay">
+  <div class="agent-login-box">
+    <h2>Secure Agent Login</h2>
+    <p>أدخل اسم الأيجنت قبل الدخول ويمكن تغييره بأي وقت</p>
+    <input type="text" id="agentLoginInput" placeholder="Agent Name" autocomplete="off">
+    <input type="password" id="agentPasswordInput" placeholder="Password" autocomplete="off">
+    <div class="login-error" id="loginError"></div>
+    <button type="button" id="agentLoginBtn">Login</button>
+  </div>
+</div>
+
+
+<button class="theme-toggle" id="themeToggle" type="button">🌙 </button>
+<button class="online-toggle" id="onlineToggle" type="button">🟢 Online</button>
+<button class="break-toggle" id="breakToggle" type="button">☕ Break</button>
+<div class="watermark">Abdulrahman Alsoub</div>
+<div class="version-status" id="versionStatus">Version: checking...</div>
+
+<div class="agent-name-display" id="agentNameDisplay">Welcome Back</div>
+<div class="agent-live-panel" id="agentLivePanel">
+  <div class="agent-live-header">
+    <div class="agent-live-title">
+      <strong>Agent Status</strong>
+      <small id="agentLiveName">Not logged in</small>
+    </div>
+    <button class="agent-logout-btn" id="agentLogoutBtn" type="button">Logout</button>
+  </div>
+  <div class="agent-live-row">
+    <span class="agent-live-status"><span class="agent-live-dot"></span>Status</span>
+    <span class="agent-live-time" id="agentOnlineTimer">Offline</span>
+  </div>
+  <div class="agent-live-row">
+    <span>Today Total</span>
+    <span class="agent-live-time" id="agentTodayTotalTimer">00:00</span>
+  </div>
+  <div class="agent-live-actions">
+    <button class="agent-online-btn" id="agentOnlineBtn" type="button">Online</button>
+    <button class="agent-offline-btn" id="agentOfflineBtn" type="button">Offline</button>
+  </div>
+</div>
+
+<div class="update-required-overlay" id="updateRequiredOverlay">
+  <div class="update-required-box">
+    <h2>Update Required</h2>
+    <p>يوجد تحديث جديد للنظام. يرجى عمل Refresh قبل المتابعة حتى تظهر لك آخر نسخة.</p>
+    <div class="update-version-details" id="updateVersionDetails">Checking version...</div>
+    <button class="update-refresh-btn" id="updateRefreshBtn" type="button">Refresh Now</button>
+  </div>
+</div>
+
+<div class="system-closed-overlay" id="systemClosedOverlay">
+  <div class="system-closed-box">
+    <h2>System Closed</h2>
+    <p>النظام مغلق مؤقتاً من قبل الأدمن للصيانة أو التحديث. يرجى الانتظار حتى يتم فتح النظام مرة أخرى.</p>
+  </div>
+</div>
+
+<div class="break-toast" id="breakToast">Break request status</div>
+
+<div class="break-request-overlay" id="breakRequestOverlay">
+  <div class="break-request-box">
+    <h2>Break Request</h2>
+    <p>اختار نوع البريك، والطلب رح يوصل للأدمن للموافقة أو الرفض.</p>
+    <div class="break-request-options">
+      <button class="break-request-option break" type="button" data-break-type="Break">Break</button>
+      <button class="break-request-option meal" type="button" data-break-type="Meal">Meal</button>
+    </div>
+    <button class="break-request-close" id="breakRequestClose" type="button">Close</button>
+  </div>
+</div>
+
+<div class="search-wrapper">
+  <div class="search-box">
+    <input type="text" id="knowledgeSearch" placeholder="Search">
+  </div>
+  <div class="no-results" id="noResults">ما في نتائج مطابقة</div>
+</div>
+
+<div class="top-widgets">
+  <div class="mini-panel">
+    <h3>⭐ Quick Access</h3>
+    <div class="mini-list" id="quickAccessList"></div>
+  </div>
+
+  <div class="mini-panel">
+    <h3>🕒 Recently Opened</h3>
+    <div class="mini-list" id="recentList"></div>
+  </div>
+</div>
+
+<div class="main-sections">
+
+  <div class="section">
+    <h2>Merchant Issue</h2>
+    <div class="empty-box">
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Order Flow</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Merchant - Order Not Confirmed" data-desc="المشكلة: الطلب ظاهر للعميل لكن لم يصل تأكيد للمطعم.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب في النظام.\n2. تأكد هل الطلب Pending أو Accepted أو Cancelled.\n3. تواصل مع المطعم للتأكيد إن كان الطلب ظاهر لديهم.\n4. إذا لم يظهر الطلب، ارفع الحالة للدعم التقني مع رقم الطلب.\n\nرد مقترح: شكراً لتواصلك معنا، سنقوم بالتحقق من حالة الطلب فوراً والتأكد من وصوله للمطعم، وسيتم تحديثك بأقرب وقت." data-img="">Order Not Confirmed</button>
+          <button class="action-btn btn2" data-title="Merchant - Store Did Not Accept" data-desc="المشكلة: المطعم لم يقبل الطلب خلال الوقت المتوقع.\n\nخطوات التعامل:\n1. تحقق من وقت إنشاء الطلب.\n2. راجع هل المطعم Online أو Busy أو Closed.\n3. تواصل مع المطعم للتأكيد.\n4. إذا لم يتم الرد، طبّق سياسة الإلغاء أو إعادة التوجيه حسب النظام.\n\nرد مقترح: نعتذر عن التأخير، يتم حالياً التحقق من قبول الطلب من المطعم وسنوافيك بالتحديث." data-img="">Not Accepted</button>
+          <button class="action-btn btn3" data-title="Merchant - Wrong Preparation Time" data-desc="المشكلة: المطعم وضع وقت تحضير غير دقيق أو تأخر بالتحضير.\n\nخطوات التعامل:\n1. تحقق من وقت التحضير المسجل.\n2. اتصل بالمطعم لمعرفة الوقت الحقيقي.\n3. حدّث العميل والكابتن بالوقت الجديد.\n4. إذا كان التأخير كبيراً، طبّق سياسة التعويض أو الإلغاء حسب الحالة.\n\nرد مقترح: نعتذر عن التأخير، تم التواصل مع المطعم للتأكد من الوقت المتوقع وسنوافيك بالتحديث مباشرة." data-img="">Preparation Delay</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Menu & Items</button>
+        <div class="group-items">
+          <button class="action-btn btn4" data-title="Merchant - Item Unavailable" data-desc="المشكلة: صنف من الطلب غير متوفر لدى المطعم.\n\nخطوات التعامل:\n1. تأكد من الصنف غير المتوفر.\n2. اسأل العميل إن كان يرغب باستبدال الصنف أو إلغائه.\n3. حدّث الطلب حسب سياسة الشركة.\n4. اطلب من المطعم تحديث المنيو لتجنب تكرار المشكلة.\n\nرد مقترح: نعتذر، أحد الأصناف غير متوفر حالياً. يمكننا مساعدتك باستبداله أو تعديل الطلب حسب رغبتك." data-img="">Item Unavailable</button>
+          <button class="action-btn btn5" data-title="Merchant - Missing Item" data-desc="المشكلة: العميل استلم الطلب ويوجد صنف ناقص.\n\nخطوات التعامل:\n1. اطلب من العميل صورة للفاتورة أو الطلب المستلم إن أمكن.\n2. تحقق من تفاصيل الطلب الأصلية.\n3. تواصل مع المطعم للتأكد.\n4. عالج الحالة حسب السياسة: إعادة إرسال الصنف، تعويض، أو رصيد.\n\nرد مقترح: نعتذر عن النقص في طلبك، سنراجع التفاصيل مع المطعم ونساعدك بالحل المناسب." data-img="">Missing Item</button>
+          <button class="action-btn btn6" data-title="Merchant - Wrong Item Prepared" data-desc="المشكلة: المطعم حضّر صنفاً مختلفاً عن المطلوب.\n\nخطوات التعامل:\n1. تحقق من تفاصيل الطلب الأصلية.\n2. اطلب صورة من العميل أو الكابتن عند الحاجة.\n3. تواصل مع المطعم لمعرفة سبب الخطأ.\n4. طبّق الحل حسب السياسة: استبدال، تعويض، أو تصعيد.\n\nرد مقترح: نعتذر عن الخطأ في تحضير الطلب، سنراجع الحالة مع المطعم ونساعدك بالحل المناسب." data-img="">Wrong Item</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Store Settings</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Merchant - Store Closed" data-desc="المشكلة: المطعم ظاهر متاح في التطبيق لكنه مغلق فعلياً.\n\nخطوات التعامل:\n1. حاول التواصل مع المطعم.\n2. إذا لم يتم الرد، تحقق من آخر نشاط للمطعم في النظام.\n3. أبلغ فريق العمليات لتحديث حالة المطعم.\n4. أخبر العميل بالخيارات المتاحة حسب الطلب.\n\nرد مقترح: نعتذر، يبدو أن المطعم غير متاح حالياً. سنساعدك بإلغاء الطلب أو اختيار حل مناسب حسب الحالة." data-img="">Store Closed</button>
+          <button class="action-btn btn2" data-title="Merchant - Price Difference" data-desc="المشكلة: يوجد اختلاف بين سعر التطبيق وسعر المطعم.\n\nخطوات التعامل:\n1. تحقق من السعر الظاهر في التطبيق.\n2. قارن السعر مع تفاصيل الطلب والفاتورة إن وجدت.\n3. لا تطلب من العميل دفع فرق غير واضح بدون تحقق.\n4. ارفع الحالة للفريق المختص لتحديث الأسعار.\n\nرد مقترح: شكراً لتنبيهك، سنراجع فرق السعر ونتأكد من تطبيق الإجراء الصحيح حسب سياسة الشركة." data-img="">Price Difference</button>
+          <button class="action-btn btn3" data-title="Merchant - Branch Location Issue" data-desc="المشكلة: موقع الفرع في النظام غير دقيق أو الكابتن وصل لمكان خاطئ.\n\nخطوات التعامل:\n1. تحقق من موقع الفرع في النظام.\n2. تواصل مع المطعم لتأكيد العنوان الصحيح.\n3. حدّث الكابتن بالموقع الصحيح إن كان في الطريق.\n4. ارفع طلب تعديل بيانات الفرع لفريق العمليات.\n\nرد مقترح: تم ملاحظة وجود مشكلة في موقع الفرع، سنقوم بتأكيد العنوان وتحديث الفريق المختص." data-img="">Branch Location</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Finance & Invoices</button>
+        <div class="group-items">
+          <div class="empty-state">Add merchant finance cases here</div>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Merchant App Support</button>
+        <div class="group-items">
+          <div class="empty-state">Add merchant app cases here</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Courier Issue</h2>
+    <div class="empty-box">
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Pickup Issues</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Courier - Driver Late To Pickup" data-desc="المشكلة: الكابتن متأخر في الوصول للمطعم لاستلام الطلب.\n\nخطوات التعامل:\n1. تحقق من موقع الكابتن الحالي.\n2. راجع وقت قبول الطلب ووقت الوصول المتوقع.\n3. تواصل مع الكابتن إذا كان التأخير غير مبرر.\n4. حدّث المطعم أو العميل إذا كان التأخير سيؤثر على التجربة.\n\nرد مقترح: يتم حالياً متابعة موقع الكابتن والتأكد من وقت الوصول المتوقع لاستلام الطلب." data-img="">Late To Pickup</button>
+          <button class="action-btn btn2" data-title="Courier - Picked Wrong Order" data-desc="المشكلة: الكابتن استلم طلباً مختلفاً من المطعم.\n\nخطوات التعامل:\n1. تحقق من رقم الطلب الموجود مع الكابتن.\n2. تواصل مع المطعم للتأكد من الطلب الصحيح.\n3. أوقف التسليم إذا كان الطلب غير صحيح.\n4. نسّق إعادة الاستلام أو الحل المناسب.\n\nرد مقترح: يتم حالياً التحقق من الطلب مع الكابتن والمطعم لضمان تسليم الطلب الصحيح." data-img="">Wrong Order Picked</button>
+          <button class="action-btn btn3" data-title="Courier - Restaurant Refused Handover" data-desc="المشكلة: المطعم يرفض تسليم الطلب للكابتن أو يقول إن الطلب غير جاهز.\n\nخطوات التعامل:\n1. تأكد من رقم الطلب مع الكابتن.\n2. تواصل مع المطعم لمعرفة سبب الرفض.\n3. إذا كان الطلب غير جاهز، حدّث وقت الانتظار.\n4. إذا كان هناك خلاف، صعّد الحالة لفريق العمليات.\n\nرد مقترح: نتابع حالياً سبب عدم تسليم الطلب للكابتن وسنقوم بتحديث الحالة حسب الإجراء المناسب." data-img="">Handover Issue</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Delivery Issues</button>
+        <div class="group-items">
+          <button class="action-btn btn4" data-title="Courier - Driver Late" data-desc="المشكلة: الكابتن متأخر عن وقت الوصول المتوقع للعميل.\n\nخطوات التعامل:\n1. تحقق من موقع الكابتن الحالي.\n2. راجع وقت الاستلام ووقت التوصيل المتوقع.\n3. تواصل مع الكابتن إذا كان التأخير غير مبرر.\n4. حدّث العميل بوقت واقعي وواضح.\n\nرد مقترح: نعتذر عن التأخير، يتم الآن متابعة موقع الكابتن وسنقوم بتحديثك بوقت الوصول المتوقع." data-img="">Driver Late</button>
+          <button class="action-btn btn5" data-title="Courier - Wrong Location" data-desc="المشكلة: الكابتن ذهب إلى موقع خاطئ بسبب pin أو عنوان غير دقيق.\n\nخطوات التعامل:\n1. تحقق من العنوان المكتوب والـ pin.\n2. اطلب من العميل إرسال وصف واضح أو موقع صحيح.\n3. شارك التحديث مع الكابتن.\n4. إذا تغيرت منطقة التوصيل، راجع سياسة الرسوم أو الإلغاء.\n\nرد مقترح: لضمان وصول الطلب بسرعة، يرجى تزويدنا بوصف واضح للموقع أو تعديل الموقع الصحيح." data-img="">Wrong Location</button>
+          <button class="action-btn btn6" data-title="Courier - Cannot Reach Customer" data-desc="المشكلة: الكابتن لا يستطيع الوصول للعميل.\n\nخطوات التعامل:\n1. تحقق من رقم العميل والعنوان.\n2. اطلب من الكابتن محاولة الاتصال مرة أخرى.\n3. تواصل مع العميل من طرف الدعم إن لزم.\n4. وثّق المحاولات قبل أي إجراء إلغاء.\n\nرد مقترح: الكابتن يحاول التواصل معك لتسليم الطلب، يرجى التأكد من الهاتف والعنوان لتجنب تأخير التوصيل." data-img="">Cannot Reach Customer</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Completion Issues</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Courier - Delivery Marked Completed" data-desc="المشكلة: الطلب ظاهر مكتمل لكن العميل يقول إنه لم يستلمه.\n\nخطوات التعامل:\n1. تحقق من وقت الإكمال وموقع الكابتن.\n2. تواصل مع الكابتن للتأكيد.\n3. اسأل العميل إن تم التسليم لشخص آخر في نفس الموقع.\n4. صعّد الحالة إذا لم يتم إثبات التسليم.\n\nرد مقترح: سنراجع تفاصيل التسليم مع الكابتن ونعود لك بالتحديث المناسب بأقرب وقت." data-img="">Completed Not Received</button>
+          <button class="action-btn btn2" data-title="Courier - Order Damaged" data-desc="المشكلة: الطلب وصل بحالة غير سليمة.\n\nخطوات التعامل:\n1. اطلب صورة واضحة للطلب.\n2. تحقق من تفاصيل المطعم والكابتن.\n3. صنّف الحالة: تلف كامل أو جزئي.\n4. عالجها حسب السياسة: تعويض، إعادة طلب، أو تصعيد.\n\nرد مقترح: نعتذر عن وصول الطلب بهذه الحالة، يرجى إرسال صورة واضحة حتى نتمكن من مراجعة الحالة ومساعدتك." data-img="">Order Damaged</button>
+          <button class="action-btn btn3" data-title="Courier - Cash Collection Issue" data-desc="المشكلة: يوجد مشكلة في تحصيل المبلغ نقداً مثل مبلغ ناقص أو اختلاف قيمة.\n\nخطوات التعامل:\n1. تحقق من قيمة الطلب وطريقة الدفع.\n2. اسأل الكابتن عن المبلغ الذي تم تحصيله.\n3. قارن المبلغ مع الفاتورة أو النظام.\n4. صعّد الحالة للمالية إذا كان هناك فرق غير مبرر.\n\nرد مقترح: سنراجع تفاصيل الدفع والتحصيل للتأكد من المبلغ الصحيح واتخاذ الإجراء المناسب." data-img="">Cash Issue</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Courier App Issues</button>
+        <div class="group-items">
+          <div class="empty-state">Add courier app cases here</div>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Courier Account</button>
+        <div class="group-items">
+          <div class="empty-state">Add courier account cases here</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Customer Issue</h2>
+    <div class="empty-box">
+
+      <div class="group-box">
+        <button class="group-btn" type="button">After Sales</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Customer - Wrong Order Received" data-desc="المشكلة: العميل استلم طلباً مختلفاً عن طلبه.\n\nخطوات التعامل:\n1. اطلب صورة للطلب المستلم والفاتورة إن وجدت.\n2. قارنها مع تفاصيل الطلب في النظام.\n3. تحقق هل الخطأ من المطعم أو الكابتن.\n4. طبّق الحل حسب السياسة: إعادة الطلب، تعويض، أو رصيد.\n\nرد مقترح: نعتذر عن الخطأ في الطلب، يرجى إرسال صورة للطلب المستلم حتى نتمكن من مساعدتك بسرعة." data-img="">Wrong Order</button>
+          <button class="action-btn btn2" data-title="Customer - Missing Item" data-desc="المشكلة: العميل استلم الطلب ويوجد صنف ناقص.\n\nخطوات التعامل:\n1. اطلب صورة للطلب المستلم إن أمكن.\n2. راجع تفاصيل الطلب الأصلية.\n3. تواصل مع المطعم للتأكيد.\n4. عالج الحالة حسب السياسة: تعويض، رصيد، أو إعادة إرسال.\n\nرد مقترح: نعتذر عن النقص في طلبك، سنراجع الحالة ونساعدك بالحل المناسب." data-img="">Missing Item</button>
+          <button class="action-btn btn3" data-title="Customer - Order Damaged" data-desc="المشكلة: الطلب وصل بحالة غير سليمة.\n\nخطوات التعامل:\n1. اطلب صورة واضحة للطلب.\n2. تحقق من تفاصيل المطعم والكابتن.\n3. صنّف الضرر: كامل أو جزئي.\n4. طبّق الإجراء المناسب حسب السياسة.\n\nرد مقترح: نعتذر عن وصول الطلب بهذه الحالة، يرجى إرسال صورة واضحة حتى نتمكن من مساعدتك." data-img="">Damaged Order</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">App Issues</button>
+        <div class="group-items">
+          <button class="action-btn btn4" data-title="Customer - Payment Failed" data-desc="المشكلة: الدفع فشل أو تم خصم مبلغ دون تأكيد الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الدفع في النظام.\n2. تحقق هل تم إنشاء الطلب أم لا.\n3. إذا تم الخصم دون طلب، ارفع الحالة لفريق المدفوعات.\n4. أخبر العميل بمدة مراجعة الدفع.\n\nرد مقترح: نعتذر عن مشكلة الدفع، سنقوم بمراجعة العملية والتأكد من حالة المبلغ بأسرع وقت." data-img="">Payment Failed</button>
+          <button class="action-btn btn5" data-title="Customer - Promo Code Issue" data-desc="المشكلة: كود الخصم لا يعمل أو لم يتم تطبيقه.\n\nخطوات التعامل:\n1. تحقق من صلاحية الكود.\n2. تأكد من شروط الاستخدام: الحد الأدنى، المطاعم المشمولة، أول طلب، أو تاريخ الانتهاء.\n3. إذا كانت الشروط صحيحة ولم يعمل الكود، صعّد الحالة.\n4. وضّح السبب للعميل بطريقة مختصرة.\n\nرد مقترح: سنراجع كود الخصم وشروطه، وإذا كان مستوفياً للشروط سنساعدك بالحل المناسب." data-img="">Promo Code</button>
+          <button class="action-btn btn6" data-title="Customer - App Not Working" data-desc="المشكلة: العميل يواجه مشكلة في التطبيق مثل تعليق، عدم تحميل، أو خطأ في الصفحة.\n\nخطوات التعامل:\n1. اسأل العميل عن نوع الجهاز وإصدار التطبيق.\n2. اطلب منه إغلاق التطبيق وفتحه مرة أخرى.\n3. اطلب تحديث التطبيق إذا كان قديماً.\n4. إذا استمرت المشكلة، اطلب صورة للخطأ وارفعها للدعم التقني.\n\nرد مقترح: نعتذر عن المشكلة التقنية، يرجى تجربة تحديث التطبيق أو إعادة تشغيله، وإذا استمرت المشكلة أرسل لنا صورة الخطأ." data-img="">App Not Working</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Order Changes</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="Customer - Change Address" data-desc="المشكلة: العميل يريد تغيير عنوان التوصيل بعد إنشاء الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب: قبل الاستلام أو بعد الاستلام.\n2. تحقق من قرب العنوان الجديد من نطاق التوصيل.\n3. تواصل مع الكابتن إن كان الطلب في الطريق.\n4. طبّق السياسة في حال وجود فرق منطقة أو رسوم.\n\nرد مقترح: يمكننا محاولة تحديث العنوان حسب حالة الطلب وموقع الكابتن، يرجى تزويدنا بالعنوان الجديد." data-img="">Change Address</button>
+          <button class="action-btn btn2" data-title="Customer - Cancel Order" data-desc="المشكلة: العميل يريد إلغاء الطلب.\n\nخطوات التعامل:\n1. تحقق من حالة الطلب.\n2. إذا لم يبدأ التحضير، يمكن الإلغاء حسب السياسة.\n3. إذا بدأ التحضير أو تم الاستلام، وضّح القيود للعميل.\n4. وثّق سبب الإلغاء.\n\nرد مقترح: سنراجع حالة الطلب الآن، وإذا كان الإلغاء متاحاً حسب السياسة سنقوم بمساعدتك مباشرة." data-img="">Cancel Order</button>
+          <button class="action-btn btn3" data-title="Customer - Refund Request" data-desc="المشكلة: العميل يطلب استرجاع المبلغ.\n\nخطوات التعامل:\n1. حدد سبب طلب الاسترجاع.\n2. تحقق من حالة الطلب والدفع.\n3. راجع سياسة الاسترجاع حسب نوع المشكلة.\n4. وضّح للعميل مدة الاسترجاع المتوقعة.\n\nرد مقترح: تم استلام طلب الاسترجاع، سنراجع الحالة حسب السياسة وسيتم إبلاغك بالتحديث ومدة المعالجة." data-img="">Refund Request</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Account & Login</button>
+        <div class="group-items">
+          <div class="empty-state">Add customer account cases here</div>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Subscription & Loyalty</button>
+        <div class="group-items">
+          <div class="empty-state">Add loyalty cases here</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>General</h2>
+    <div class="empty-box">
+      <div class="group-box">
+        <button class="group-btn" type="button">Agent Guidelines</button>
+        <div class="group-items">
+          <button class="action-btn btn1" data-title="General - Escalation Rules" data-desc="متى يتم التصعيد؟\n\n1. مشكلة دفع أو مبلغ مخصوم.\n2. طلب مكتمل لكن العميل لم يستلمه.\n3. شكوى متكررة من نفس المطعم أو الكابتن.\n4. حالة تحتاج صلاحية غير متاحة للموظف.\n5. وجود ضرر واضح في تجربة العميل.\n\nمعلومة مهمة: التصعيد يجب أن يحتوي رقم الطلب، ملخص المشكلة، الإجراءات التي تمت، ولقطات أو صور إن وجدت." data-img="">Escalation Rules</button>
+          <button class="action-btn btn2" data-title="General - Tone of Voice" data-desc="أسلوب الرد المعتمد:\n\n1. اعتذار مختصر عند وجود مشكلة.\n2. لا تلوم العميل أو المطعم أو الكابتن مباشرة.\n3. استخدم جمل واضحة وقصيرة.\n4. أعطِ العميل خطوة تالية واضحة.\n5. لا تعد العميل بتعويض قبل التأكد من السياسة.\n\nمثال: نعتذر عن الإزعاج، سنراجع الحالة الآن ونعود لك بالتحديث المناسب." data-img="">Tone of Voice</button>
+          <button class="action-btn btn6" data-title="General - Closing Script" data-desc="سكريبت إغلاق المحادثة:\n\nشكراً لتواصلك معنا، نعتذر مرة أخرى عن أي إزعاج حصل. تم اتخاذ الإجراء المناسب حسب الحالة، وإذا احتجت أي مساعدة إضافية نحن دائماً بخدمتك.\n\nمتى يستخدم؟\nبعد حل المشكلة أو توضيح الإجراء النهائي للعميل." data-img="">Closing Script</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Case Handling</button>
+        <div class="group-items">
+          <button class="action-btn btn3" data-title="General - Required Information" data-desc="المعلومات المطلوبة قبل معالجة أي حالة:\n\n1. رقم الطلب.\n2. رقم هاتف العميل إن لزم.\n3. نوع المشكلة.\n4. صور أو إثباتات عند الحاجة.\n5. وقت حدوث المشكلة.\n6. الإجراء المطلوب من العميل.\n\nالهدف: تقليل الرجوع للعميل أكثر من مرة وتسريع الحل." data-img="">Required Info</button>
+          <button class="action-btn btn4" data-title="General - Compensation Check" data-desc="قبل التعويض تحقق من:\n\n1. هل المشكلة مثبتة؟\n2. هل يوجد صورة أو دليل؟\n3. هل الخطأ من المطعم أو الكابتن أو النظام؟\n4. هل العميل مؤهل حسب السياسة؟\n5. هل تم تعويض العميل سابقاً لنفس الطلب؟\n\nملاحظة: لا يتم ذكر قيمة التعويض قبل التأكد من السياسة والصلاحية." data-img="">Compensation Check</button>
+          <button class="action-btn btn5" data-title="General - Ticket Documentation" data-desc="طريقة توثيق التذكرة:\n\n1. اكتب ملخص المشكلة بجملة واحدة.\n2. أضف رقم الطلب.\n3. اذكر الطرف المتأثر: عميل، مطعم، كابتن.\n4. اذكر الإجراء الذي قمت به.\n5. أضف الخطوة التالية المطلوبة.\n\nمثال: العميل استلم طلب ناقص، تم طلب صورة والتواصل مع المطعم، بانتظار التأكيد." data-img="">Ticket Documentation</button>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Quality & Training</button>
+        <div class="group-items">
+          <div class="empty-state">Add QA and training cases here</div>
+        </div>
+      </div>
+
+      <div class="group-box">
+        <button class="group-btn" type="button">Internal Tools</button>
+        <div class="group-items">
+          <div class="empty-state">Add internal tools guides here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-box">
+    <div class="popup-header">
+      <h3 class="popup-title" id="popupTitle">عنوان الشرح</h3>
+      <button class="close-popup" id="closePopup">×</button>
+    </div>
+
+    <div class="popup-content">
+      <div class="popup-text" id="popupDesc">
+        هنا يظهر شرح الزر.
+      </div>
+
+      <div class="popup-image-box" id="popupImageBox">
+        <span>مكان صورة المشكلة</span>
+        <img id="popupImage" src="" alt="صورة المشكلة">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/system.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/attendance.js"></script>
+<script src="js/feedback.js"></script>
+<script src="js/popup.js"></script>
+<script src="js/search.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function () {
+  const BREAK_API_URL = 'https://script.google.com/macros/s/AKfycbzexHG-bjSdMaQIwyU0dHnSmKkwaHW_BTW5BWnSml4Ir5AAqRmd7jOrLRXgfZ-42zH4/exec';
+  const seenBreakDecisionKey = 'knowledgeSeenBreakDecisions';
+  let breakRequestSending = false;
+
+  function getSavedAgentNameForBreak() {
+    return localStorage.getItem('knowledgeAgentName') || '';
+  }
+
+  function breakJsonp(params) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'breakCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+      const script = document.createElement('script');
+      const query = new URLSearchParams({ ...params, callback: callbackName, t: Date.now() });
+
+      window[callbackName] = function (response) {
+        resolve(response || {});
+        script.remove();
+        delete window[callbackName];
+      };
+
+      script.onerror = function () {
+        reject(new Error('Break request connection failed'));
+        script.remove();
+        delete window[callbackName];
+      };
+
+      script.src = BREAK_API_URL + '?' + query.toString();
+      document.body.appendChild(script);
+    });
+  }
+
+  function showBreakToast(message, type) {
+    const toast = document.getElementById('breakToast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.className = 'break-toast show ' + (type || '');
+
+    setTimeout(() => {
+      toast.className = 'break-toast';
+    }, 5200);
+  }
+
+  function getSeenBreakDecisionIds() {
+    try {
+      return JSON.parse(localStorage.getItem(seenBreakDecisionKey) || '[]');
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveSeenBreakDecisionIds(ids) {
+    localStorage.setItem(seenBreakDecisionKey, JSON.stringify(ids.slice(-80)));
+  }
+
+  async function submitBreakRequest(breakType) {
+    if (breakRequestSending) return;
+    const agentName = getSavedAgentNameForBreak();
+
+    if (!agentName) {
+      showBreakToast('Please login first before requesting a break.', 'error');
+      return;
+    }
+
+    breakRequestSending = true;
+
+    try {
+      const result = await breakJsonp({
+        action: 'requestBreak',
+        agentName,
+        breakType,
+        page: location.pathname || 'Knowledge Base',
+        version: window.SYSTEM_VERSION || ''
+      });
+
+      showBreakToast(result.message || 'Break request sent to admin.', result.success ? 'success' : 'error');
+
+      if (result.success) {
+        document.getElementById('breakRequestOverlay').classList.remove('show');
+        setTimeout(checkBreakDecision, 1200);
+      }
+    } catch (error) {
+      showBreakToast(error.message || 'Failed to send break request.', 'error');
+    } finally {
+      breakRequestSending = false;
+    }
+  }
+
+  async function checkBreakDecision() {
+    const agentName = getSavedAgentNameForBreak();
+    if (!agentName) return;
+
+    try {
+      const result = await breakJsonp({
+        action: 'getAgentBreakRequests',
+        agentName
+      });
+
+      if (!result.success) return;
+
+      const requests = result.requests || [];
+      const seenIds = getSeenBreakDecisionIds();
+      const seenSet = new Set(seenIds);
+      let changed = false;
+
+      requests.forEach((request) => {
+        const id = String(request.id || '').trim();
+        const status = String(request.status || '').trim().toLowerCase();
+
+        if (!id || status === 'pending' || seenSet.has(id)) return;
+
+        if (status === 'approved') {
+          showBreakToast(`✅ Your ${request.breakType || 'Break'} request has been approved`, 'success');
+          seenSet.add(id);
+          changed = true;
+        } else if (status === 'rejected') {
+          showBreakToast(`❌ Your ${request.breakType || 'Break'} request has been rejected`, 'error');
+          seenSet.add(id);
+          changed = true;
+        }
+      });
+
+      if (changed) saveSeenBreakDecisionIds(Array.from(seenSet));
+    } catch (error) {
+      // silent check
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const breakToggle = document.getElementById('breakToggle');
+    const breakOverlay = document.getElementById('breakRequestOverlay');
+    const breakClose = document.getElementById('breakRequestClose');
+
+    if (breakToggle && breakOverlay) {
+      breakToggle.addEventListener('click', () => {
+        breakOverlay.classList.add('show');
+      });
+    }
+
+    if (breakClose && breakOverlay) {
+      breakClose.addEventListener('click', () => {
+        breakOverlay.classList.remove('show');
+      });
+
+      breakOverlay.addEventListener('click', (event) => {
+        if (event.target === breakOverlay) {
+          breakOverlay.classList.remove('show');
+        }
+      });
+    }
+
+    document.querySelectorAll('.break-request-option').forEach((button) => {
+      button.addEventListener('click', () => {
+        submitBreakRequest(button.dataset.breakType || 'Break');
+      });
+    });
+
+    checkBreakDecision();
+    setInterval(checkBreakDecision, 5000);
+  });
+})();
+</script>
+</body>
+</html>
